@@ -1,0 +1,12 @@
+# facture.yml
+template: |
+  Facture : {{ ref }}
+  Date    : {{ date }}
+  Immat.  : {{ immatriculation }}
+  Véhicule: {{ vehicule }}
+  Total TTC: {{ total_ttc }} Dinars
+
+  {% if _raw_snip %}
+  --- extrait brut OCR (débug) ---
+  {{ _raw_snip }}
+  {% endif %}

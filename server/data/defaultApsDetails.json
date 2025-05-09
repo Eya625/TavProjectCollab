@@ -1,0 +1,227 @@
+[
+    {
+      "id": "1397",
+      "employe": "MELANIE LEFEBVRE",
+      "card_number": "31771",
+      "dep_code": "150501",
+      "location": "HO",
+      "monthly_limit": 2000
+    },
+    {
+      "id": "1398",
+      "employe": "FRANCIS SESPLUGUES",
+      "card_number": "034395",
+      "dep_code": "200100",
+      "location": "HO",
+      "monthly_limit": 600
+    },
+    {
+      "id": "1020",
+      "employe": "MEJDA BACCOUCHE",
+      "card_number": "9464",
+      "dep_code": "110501",
+      "location": "HO",
+      "monthly_limit": 250
+    },
+    {
+      "id": "1292",
+      "employe": "METIN BATAK",
+      "card_number": "27114",
+      "dep_code": "100200",
+      "location": "HO",
+      "monthly_limit": 1000
+    },
+    {
+      "id": "1",
+      "employe": "KAHENA MAMLOUK",
+      "card_number": "9462",
+      "dep_code": "150501",
+      "location": "HO",
+      "monthly_limit": 600
+    },
+    {
+      "id": "4",
+      "employe": "MOURAD KANOUN",
+      "card_number": "9455",
+      "dep_code": "150500",
+      "location": "HO",
+      "monthly_limit": 750
+    },
+    {
+      "id": "793",
+      "employe": "MONDHER GHRAIRI",
+      "card_number": "9458",
+      "dep_code": "111500",
+      "location": "HO",
+      "monthly_limit": 750
+    },
+    {
+      "id": "1261",
+      "employe": "ADEL MIGAOUI",
+      "card_number": "9457",
+      "dep_code": "202101",
+      "location": "MIR",
+      "monthly_limit": 350
+    },
+    {
+      "id": "11",
+      "employe": "RIM DHAMER",
+      "card_number": "9470",
+      "dep_code": "112500",
+      "location": "HO",
+      "monthly_limit": 350
+    },
+    {
+      "id": "816",
+      "employe": "ADEL EL AROUI",
+      "card_number": "9468",
+      "dep_code": "150506",
+      "location": "HO",
+      "monthly_limit": 450
+    },
+    {
+      "id": "1123",
+      "employe": "ADNEN GUEFRACH",
+      "card_number": "9473",
+      "dep_code": "130400",
+      "location": "HO",
+      "monthly_limit": 750
+    },
+    {
+      "id": "27012",
+      "employe": "ANIS ABDALLAH",
+      "card_number": "21342",
+      "dep_code": "201100",
+      "location": "MIR",
+      "monthly_limit": 350
+    },
+    {
+      "id": "1376",
+      "employe": "PERO LUPEVSKI",
+      "card_number": "21330",
+      "dep_code": "260000",
+      "location": "NBE",
+      "monthly_limit": 450
+    },
+    {
+      "id": "276",
+      "employe": "NAJLA KALLEL",
+      "card_number": "9477",
+      "dep_code": "120500",
+      "location": "HO",
+      "monthly_limit": 250
+    },
+    {
+      "id": "221",
+      "employe": "SAMI BOUAZIZI",
+      "card_number": "22550",
+      "dep_code": "240190",
+      "location": "MIR",
+      "monthly_limit": 1000
+    },
+    {
+      "id": "146",
+      "employe": "MERIEM ABDELJELIL",
+      "card_number": "28865",
+      "dep_code": "240190",
+      "location": "NBE",
+      "monthly_limit": 450
+    },
+    {
+      "id": "1500",
+      "employe": "ANIS BEN OTHMAN",
+      "card_number": "36847",
+      "dep_code": "111500",
+      "location": "HO",
+      "monthly_limit": 750
+    },
+    {
+      "id": "93221",
+      "employe": "AKRAM AYARA",
+      "card_number": "27601",
+      "dep_code": "100300",
+      "location": "HO",
+      "monthly_limit": 600
+    },
+    {
+      "id": "",
+      "employe": "MERCEDES",
+      "card_number": "9465",
+      "dep_code": "100000",
+      "location": "HO",
+      "monthly_limit": 300
+    },
+    {
+      "id": "",
+      "employe": "NBE Airside",
+      "card_number": "9466",
+      "dep_code": "201101",
+      "location": "NBE",
+      "monthly_limit": 4000
+    },
+    {
+      "id": "",
+      "employe": "Car Admin Transport",
+      "card_number": "9476",
+      "dep_code": "150501",
+      "location": "NBE",
+      "monthly_limit": 7000
+    },
+    {
+      "id": "",
+      "employe": "Head office",
+      "card_number": "9471",
+      "dep_code": "150501",
+      "location": "HO",
+      "monthly_limit": 350
+    },
+    {
+      "id": "",
+      "employe": "NBE tech",
+      "card_number": "9475",
+      "dep_code": "240211",
+      "location": "NBE",
+      "monthly_limit": 1000
+    },
+    {
+      "id": "",
+      "employe": "NBE land side",
+      "card_number": "9474",
+      "dep_code": "201101",
+      "location": "NBE",
+      "monthly_limit": 1000
+    },
+    {
+      "id": "",
+      "employe": "MIR Car Admin Transport",
+      "card_number": "9453",
+      "dep_code": "150501",
+      "location": "MIR",
+      "monthly_limit": 1500
+    },
+    {
+      "id": "",
+      "employe": "Security & safety",
+      "card_number": "9454",
+      "dep_code": "150506",
+      "location": "NBE",
+      "monthly_limit": 2000
+    },
+    {
+      "id": "",
+      "employe": "NBE police chief",
+      "card_number": "9459",
+      "dep_code": "150506",
+      "location": "NBE",
+      "monthly_limit": 450
+    },
+    {
+      "id": "",
+      "employe": "MIR police chief",
+      "card_number": "9460",
+      "dep_code": "150506",
+      "location": "MIR",
+      "monthly_limit": 150
+    }
+  ]
+  
