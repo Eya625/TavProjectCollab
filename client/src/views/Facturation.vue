@@ -11,7 +11,9 @@
       </div>
 
       <div class="file-input-group">
-        <label for="pdf-upload" class="sr-only">Sélectionner un fichier PDF</label>
+        <label for="pdf-upload" class="sr-only"
+          >Sélectionner un fichier PDF</label
+        >
         <input
           id="pdf-upload"
           type="file"
@@ -24,7 +26,9 @@
           @click="doUpload"
           class="btn btn-primary"
         >
-          {{ loading.upload ? 'Extraction en cours…' : 'Extraire & Prévisualiser' }}
+          {{
+            loading.upload ? 'Extraction en cours…' : 'Extraire & Prévisualiser'
+          }}
         </button>
       </div>
       <p v-if="error.upload" class="error-message">{{ error.upload }}</p>
@@ -32,47 +36,78 @@
       <!-- Aperçu des données extraites -->
       <div v-if="extracted" class="data-preview">
         <h3 class="preview-title">Données extraites</h3>
-        <p class="info-message">Méthode d’extraction : {{ extracted.extractor }}</p>
+        <p class="info-message">
+          Méthode d’extraction : {{ extracted.extractor }}
+        </p>
         <ul>
+          <!-- Référence -->
           <li class="detail-item">
             <span class="label">Référence :</span>
-            <span class="value">{{ displayField(extracted.Ref) }}</span>
+            <input
+              type="text"
+              v-model="extracted.ref"
+              class="value"
+              placeholder="Référence"
+            />
           </li>
+
+          <!-- Date -->
           <li class="detail-item">
             <span class="label">Date :</span>
-            <span class="value">{{ displayField(extracted.Date) }}</span>
+            <input
+              type="text"
+              v-model="extracted.date"
+              class="value"
+              placeholder="JJ/MM/AAAA"
+            />
           </li>
+
+          <!-- Immatriculation (select) -->
           <li class="detail-item">
             <span class="label">Immatriculation :</span>
-            <template v-if="!fallbackMode">
-              <span class="value">{{ displayField(extracted.Immatriculation) }}</span>
-            </template>
-            <template v-else>
-              <select v-model="extracted.Immatriculation" class="value">
-                <option disabled value="">-- Sélectionnez une immatriculation --</option>
-                <option
-                  v-for="option in vehicleOptions"
-                  :key="option.Immatriculation"
-                  :value="option.Immatriculation"
-                >
-                  {{ option.Immatriculation }}
-                </option>
-              </select>
-            </template>
+            <select v-model="extracted.immatriculation" class="value">
+              <option disabled value="">
+                -- Sélectionnez une immatriculation --
+              </option>
+              <option
+                v-for="veh in vehicleOptions"
+                :key="veh.immatriculation"
+                :value="veh.immatriculation"
+              >
+                {{ veh.immatriculation }}
+              </option>
+            </select>
           </li>
+
+          <!-- Véhicule (select) -->
           <li class="detail-item">
             <span class="label">Véhicule :</span>
-            <template v-if="!fallbackMode">
-              <span class="value">{{ displayField(extracted.Type) }}</span>
-            </template>
-            <template v-else>
-              <input type="text" class="value" v-model="extracted.Type" disabled />
-            </template>
+            <select v-model="extracted.type" class="value">
+              <option disabled value="">
+                -- Sélectionnez un type de véhicule --
+              </option>
+              <option
+                v-for="veh in vehicleOptions"
+                :key="veh.type + veh.immatriculation"
+                :value="veh.type"
+              >
+                {{ veh.type }}
+              </option>
+            </select>
           </li>
+
+          <!-- Total TTC -->
           <li class="detail-item">
             <span class="label">Total TTC :</span>
-            <span class="value">{{ displayField(extracted.Montant) }}</span>
+            <input
+              type="text"
+              v-model="extracted.montant"
+              class="value"
+              placeholder="Total TTC"
+            />
           </li>
+
+          <!-- Statut -->
           <li class="detail-item">
             <span class="label">Statut :</span>
             <select v-model="extracted.statut" class="value">
@@ -82,6 +117,7 @@
             </select>
           </li>
         </ul>
+
         <div class="actions">
           <button
             :disabled="loading.register"
@@ -90,7 +126,9 @@
           >
             {{ loading.register ? 'Enregistrement…' : 'Enregistrer en BDD' }}
           </button>
-          <p v-if="error.register" class="error-message">{{ error.register }}</p>
+          <p v-if="error.register" class="error-message">
+            {{ error.register }}
+          </p>
         </div>
       </div>
     </section>
@@ -99,7 +137,9 @@
     <section class="list-section">
       <div class="section-header">
         <h2>Factures enregistrées</h2>
-        <button @click="fetchInvoices" class="btn btn-secondary">Rafraîchir la liste</button>
+        <button @click="fetchInvoices" class="btn btn-secondary">
+          Rafraîchir la liste
+        </button>
       </div>
 
       <p v-if="loading.list" class="info-message">Chargement…</p>
@@ -135,11 +175,19 @@
       </table>
 
       <div class="pagination-controls" v-if="totalPages > 1">
-        <button :disabled="currentPage === 1" @click="currentPage--" class="btn btn-secondary">
+        <button
+          :disabled="currentPage === 1"
+          @click="currentPage--"
+          class="btn btn-secondary"
+        >
           « Précédent
         </button>
         <span>Page {{ currentPage }} / {{ totalPages }}</span>
-        <button :disabled="currentPage === totalPages" @click="currentPage++" class="btn btn-secondary">
+        <button
+          :disabled="currentPage === totalPages"
+          @click="currentPage++"
+          class="btn btn-secondary"
+        >
           Suivant »
         </button>
       </div>
@@ -152,12 +200,16 @@
     <div v-if="showPdfModal" class="modal-overlay" @click.self="closePdfModal">
       <div class="modal-container">
         <button class="modal-close" @click="closePdfModal">×</button>
-        <iframe v-if="currentPdfUrl" :src="currentPdfUrl" frameborder="0" class="pdf-frame"></iframe>
+        <iframe
+          v-if="currentPdfUrl"
+          :src="currentPdfUrl"
+          frameborder="0"
+          class="pdf-frame"
+        ></iframe>
       </div>
     </div>
   </div>
 </template>
-
 <script>
 import apiServices from '../services/apiServices';
 import VehicleNavbar from '../components/VehicleNavbar.vue';
@@ -183,6 +235,7 @@ export default {
   },
   mounted() {
     this.fetchInvoices();
+    this.fetchVehicleOptions();
   },
   computed: {
     totalPages() {
@@ -208,6 +261,8 @@ export default {
       this.extracted = null;
       this.error.upload = '';
     },
+
+    // 1) Upload & extraction avec remappage vers minuscules
     async doUpload() {
       if (!this.pdfFile) return;
       this.loading.upload = true;
@@ -217,8 +272,33 @@ export default {
         form.append('pdf', this.pdfFile);
         const result = await apiServices.uploadVehicleInvoice(form);
         if (!result.success) throw new Error(result.message);
-        this.extracted = result.data;
-        if (!this.extracted.Immatriculation || !this.extracted.Type) {
+        // 1️ on charge toujours la liste avant de mapper extracted
+        await this.fetchVehicleOptions();
+        const d = result.data;
+
+        this.extracted = {
+          ref: d.Ref ?? d.ref ?? '',
+          date: d.Date ?? d.date ?? '',
+          montant: d.total_ttc ?? d.Montant ?? d.montant ?? '',
+          // on ajoute d.vehicule au fallback de type, et d.Vehicule par sécurité
+          immatriculation: d.Immatriculation ?? d.immatriculation ?? '',
+          type: d.Type ?? d.type ?? d.Vehicule ?? d.vehicule ?? '',
+          statut: d.statut ?? 'non payé',
+          extractor: result.extractor ?? d.extractor ?? ''
+        };
+        // 2️⃣ si la valeur extraite n'était pas déjà dans vehicleOptions, on l'y ajoute
+        if (
+          this.extracted.immatriculation &&
+          !this.vehicleOptions.find(
+            (v) => v.immatriculation === this.extracted.immatriculation
+          )
+        ) {
+          this.vehicleOptions.unshift({
+            immatriculation: this.extracted.immatriculation,
+            type: this.extracted.type
+          });
+        }
+        if (!this.extracted.immatriculation || !this.extracted.type) {
           this.fallbackMode = true;
           await this.fetchVehicleOptions();
         }
@@ -228,22 +308,39 @@ export default {
         this.loading.upload = false;
       }
     },
+
+    // 2) Récupération des options véhicules avec clés minuscules
     async fetchVehicleOptions() {
       try {
         const list = await apiServices.getVehicleList();
-        this.vehicleOptions = Array.isArray(list) ? list : [];
-      } catch (err) {
-        console.error('Erreur lors du chargement des véhicules.', err);
+        this.vehicleOptions = list.map((v) => ({
+          immatriculation: v.Immatriculation,
+          type: v.Type,
+          assignedTo: v.assignedTo,
+          allocation: v.allocation
+        }));
+      } catch (error) {
+        console.error('Erreur lors du chargement des véhicules :', error);
       }
     },
+
+    // 3) Enregistrement en BDD avec reconversion vers PascalCase
     async doRegister() {
-      if (!this.extracted?.Montant || !this.extracted?.Ref) {
+      if (!this.extracted?.montant || !this.extracted?.ref) {
         this.error.register = 'Certains champs sont manquants';
         return;
       }
       this.loading.register = true;
       try {
-        await apiServices.registerVehicleInvoice({ data: this.extracted });
+        const payload = {
+          Ref: this.extracted.ref,
+          Date: this.extracted.date,
+          Immatriculation: this.extracted.immatriculation,
+          Type: this.extracted.type,
+          Montant: this.extracted.montant,
+          statut: this.extracted.statut
+        };
+        await apiServices.registerVehicleInvoice({ data: payload });
         this.error.register = '';
         this.extracted = null;
         this.currentPage = 1;
@@ -257,21 +354,25 @@ export default {
         this.loading.register = false;
       }
     },
+
+    // 4) Liste des factures (inchangé)
     async fetchInvoices() {
       this.loading.list = true;
       try {
         const list = await apiServices.getVehicleInvoices();
         this.invoices = Array.isArray(list) ? list : [];
-      } catch (err) {
+      } catch {
         this.error.list = 'Impossible de récupérer la liste.';
       } finally {
         this.loading.list = false;
       }
     },
+
     formatDate(dateStr) {
       const d = new Date(dateStr);
       return isNaN(d) ? dateStr : d.toLocaleDateString('fr-FR');
     },
+
     async openInvoicePdf(inv) {
       this.errorPdf = '';
       try {
@@ -281,21 +382,32 @@ export default {
         this.errorPdf = 'Impossible de charger l’URL du PDF.';
       }
     },
+
     closePdfModal() {
       URL.revokeObjectURL(this.currentPdfUrl);
       this.showPdfModal = false;
     }
   },
+
   watch: {
-    'extracted.Immatriculation'(newVal) {
-      if (this.fallbackMode) {
-        const sel = this.vehicleOptions.find(v => v.Immatriculation === newVal);
-        if (sel) this.extracted.Type = sel.Type;
+    // 5) Watcher mis à jour pour clé minuscules
+    async 'extracted.immatriculation'(newVal) {
+      if (this.fallbackMode && newVal) {
+        try {
+          const veh = await apiServices.getVehicleByImmat(newVal);
+          this.extracted.type = veh.Type || '';
+          this.extracted.assignedTo = veh.assignedTo || '';
+        } catch {
+          console.warn('Véhicule non trouvé pour immat', newVal);
+          this.extracted.type = '';
+          this.extracted.assignedTo = '';
+        }
       }
     }
   }
 };
 </script>
+
 <style scoped>
 /* Container principal */
 .facturation-container {

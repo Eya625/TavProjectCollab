@@ -63,7 +63,7 @@ export default {
   },
   methods: {
     async fetchVehicles() {
-      this.vehicles = await apiServices.getVehicles().catch(err => console.error(err));
+      this.vehicles = await apiServices.getAllVehicles().catch(err => console.error(err));
     },
     openAddForm() {
       const nums = this.vehicles.map(v => v.N || 0);

@@ -12,4 +12,4 @@ const VehicleSchema = new Schema({
   allocation: { type: String, required: true }
 });
 
-module.exports = mongoose.model('Vehicle', VehicleSchema, 'vehicles');
+module.exports = mongoose.model('Vehicles', VehicleSchema, 'vehicles');

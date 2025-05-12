@@ -17,6 +17,7 @@ import ManageVehicle from '../views/ManageVehicle.vue';
 import VehicleNavbar from '../components/VehicleNavbar.vue';
 import Facturation from '../views/Facturation.vue';
 import DashboardChart from '../views/dashboardChart.vue';
+import FinanceDashboard from '../views/FinanceDashboard.vue';
 
 
 const routes = [
@@ -43,8 +44,8 @@ const routes = [
   { path : '/manageVehicle',component:ManageVehicle},
   { path : '/nav',component: VehicleNavbar},
   { path: '/facturation',component: Facturation},
-  { path: '/dashchart',component: DashboardChart}
-
+  { path: '/dashchart',component: DashboardChart},
+  { path: '/dashboard/finance', component: FinanceDashboard },
 ];
 
 const router = createRouter({
