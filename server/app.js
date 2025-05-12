@@ -19,6 +19,8 @@ const billingRoutes = require('./routes/billingRoutes');
 const printerRoutes = require('./routes/printerRoutes');
 const detailsRelevesRoutes =require('./routes/detailsRelevesRoutes');
 const invoicePDFRoutes = require('./routes/invoicePDFRoutes');
+const dashboardFinRoutes = require('./routes/dashboardFinanceRoutes');
+
 // --- App & Server Initialization ---
 const app = express();
 const server = http.createServer(app);
@@ -57,7 +59,7 @@ mongoose
       const changeStream = coll.watch();
 
       changeStream.on('change', change => {
-        console.log('🔄 ChangeStream event:', change);
+        console.log(' ChangeStream event:', change);
         if (change.operationType === 'insert') {
           // envoie le document inséré aux clients connectés
           io.emit('dataChanged', change.fullDocument);
@@ -82,7 +84,7 @@ app.use('/api/billing', billingRoutes);
 app.use('/api/printers',printerRoutes);
 app.use('/api/billing/releves', detailsRelevesRoutes);
 app.use('/api/invoicespdf', invoicePDFRoutes);
-
+app.use('/api/dashboard/finance/kpis',dashboardFinRoutes);
 
 // --- Socket.io Events ---
 io.on('connection', socket => {

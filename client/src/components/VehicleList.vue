@@ -141,7 +141,10 @@ import apiServices from '../services/apiServices';
 export default {
   name: 'VehicleList',
   props: {
-    vehicles: { type: Array, required: true }
+    vehicles: {
+      type: Array,
+      required: true
+    }
   },
   data() {
     return {
@@ -152,6 +155,7 @@ export default {
       selectedInvoice: null,
       uploading: false,
       invoiceSaved: false,
+
       showSuccessNotification: false,
       notificationMessage: '',
       notificationType: ''    // 'success' ou 'error'
@@ -159,7 +163,7 @@ export default {
   },
   computed: {
     filteredVehicles() {
-      const term = this.search.toLowerCase();
+      const term = this.search.trim().toLowerCase();
       return this.vehicles.filter(v =>
         Object.values(v).some(val =>
           val != null && val.toString().toLowerCase().includes(term)
@@ -167,20 +171,32 @@ export default {
       );
     },
     paginatedVehicles() {
+      // si la page courante dépasse totalPages, on la remet à 1
+      if (this.currentPage > this.totalPages) {
+        this.currentPage = 1;
+      }
       const start = (this.currentPage - 1) * this.perPage;
       return this.filteredVehicles.slice(start, start + this.perPage);
     },
     totalPages() {
-      return Math.ceil(this.filteredVehicles.length / this.perPage);
+      return Math.max(1, Math.ceil(this.filteredVehicles.length / this.perPage));
     }
   },
   methods: {
+    // expose la fonction d'utilitaire
     normalizeImmat,
+
+    // formate une date ou affiche '–' si invalide ou manquante
     formatDate(date) {
-      return new Date(date).toLocaleDateString('fr-FR', {
+      const d = new Date(date);
+      if (!date || isNaN(d)) {
+        return '–';
+      }
+      return d.toLocaleDateString('fr-FR', {
         day: '2-digit', month: 'short', year: 'numeric'
       });
     },
+
     showNotification(message, type = 'success') {
       this.notificationMessage = message;
       this.notificationType = type;
@@ -189,6 +205,7 @@ export default {
         this.showSuccessNotification = false;
       }, 3000);
     },
+
     async showInvoices(vehicle) {
       const immat = normalizeImmat(vehicle.registrationNumber);
       try {
@@ -212,42 +229,41 @@ export default {
       this.selectedInvoice = null;
       this.invoiceSaved = false;
     },
+
     closeDrawer() {
       this.selectedVehicle = null;
       this.selectedInvoice = null;
       this.invoiceSaved = false;
     },
+
     previewInvoice(inv) {
       this.selectedInvoice = inv;
     },
+
     closePreview() {
       this.selectedInvoice = null;
     },
+
     async handleFileChange(event) {
       const file = event.target.files[0];
       if (!file || !this.selectedVehicle) return;
 
       const expectedImmat = normalizeImmat(this.selectedVehicle.registrationNumber);
-
       this.uploading = true;
+
       try {
         const formData = new FormData();
         formData.append('pdf', file);
-        // on envoie quand même l’immat au back pour extraction si besoin
         formData.append('immatriculation', expectedImmat);
 
-        // 1) Upload + extraction
         const uploadRes = await apiServices.uploadVehicleInvoice(formData);
         if (!uploadRes.success) {
           this.showNotification('Échec du téléversement de la facture', 'error');
           return;
         }
 
-        // Extrait par le back-end
         const extracted = uploadRes.data;
         const extractedImmat = normalizeImmat(extracted.Immatriculation || '');
-
-        // 2) TEST D’IMMATRICULATION
         if (extractedImmat !== expectedImmat) {
           this.showNotification(
             `Immatriculation extraite (${extractedImmat}) ne correspond pas à ${expectedImmat}.`,
@@ -256,14 +272,12 @@ export default {
           return;
         }
 
-        // 3) TEST D’UNICITÉ DE LA RÉFÉRENCE
         const newRef = extracted.Ref;
         if (this.selectedVehicle.invoices.some(inv => inv.Ref === newRef)) {
           this.showNotification(`La référence ${newRef} existe déjà.`, 'error');
           return;
         }
 
-        // 4) Enregistrement en base
         const invoiceData = {
           Ref:             extracted.Ref,
           Date:            extracted.Date,
@@ -277,11 +291,9 @@ export default {
           return;
         }
 
-        // 5) Rechargement des factures
         await this.showInvoices(this.selectedVehicle);
         this.invoiceSaved = true;
         this.showNotification('Facture enregistrée avec succès', 'success');
-
       } catch (err) {
         console.error(err);
         this.showNotification('Une erreur est survenue lors de l’enregistrement.', 'error');
@@ -292,6 +304,7 @@ export default {
   }
 };
 </script>
+
 
 
 

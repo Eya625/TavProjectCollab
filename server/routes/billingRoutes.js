@@ -6,7 +6,8 @@ const {
   handleInvoiceUpload,
   getVehicleInvoices,
   registerVehicleInvoice,
-  getInvoicePdf
+  getInvoicePdf,
+  getInvoiceStats 
 } = require("../controllers/BillingController");
 
 const router = express.Router();
@@ -34,5 +35,7 @@ router.post("/", registerVehicleInvoice);
 
 // 4) Télécharger le PDF d'une facture
 router.get("/:id/pdf", getInvoicePdf);
+
+router.get("/stats", getInvoiceStats);
 
 module.exports = router;

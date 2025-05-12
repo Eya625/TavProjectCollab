@@ -25,12 +25,10 @@ exports.getById = async (req, res) => {
 
 // Ajouter un nouveau véhicule
 exports.add = async (req, res) => {
-  // On extrait les champs en supposant que le client envoie "branch" pour la branche
   const { N, assignedTo, Brunch, model, year, dateOf1stRegistration, registrationNumber, allocation } = req.body;
   const vehicle = new Vehicle({
     N,
     assignedTo,
-    // Utilisation de "branch" pour renseigner le champ "Brunch" dans le modèle
     Brunch,
     model,
     year,
@@ -46,7 +44,6 @@ exports.add = async (req, res) => {
   }
 };
 
-// controllers/vehicleController.js
 
 // Mettre à jour un véhicule existant
 exports.update = async (req, res) => {
@@ -57,7 +54,6 @@ exports.update = async (req, res) => {
     }
 
     // On extrait les données depuis le corps de la requête.
-    // On attend désormais "Brunch" et non "branch" pour être en cohérence avec le frontend.
     const {
       N,
       assignedTo,
@@ -109,6 +105,61 @@ exports.delete = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+exports.getListForSelect = async (req, res) => {
+  try {
+    console.log(" Requête reçue pour getListForSelect");
+    const list = await Vehicle.find({}, 'registrationNumber model').lean();
+    console.log(" Liste trouvée:", list);
+    const mapped = list.map(v => ({
+      Immatriculation: v.registrationNumber,
+      Type: v.model
+    }));
+    return res.status(200).json(mapped);
+  } catch (err) {
+    console.error('🏷 Erreur getListForSelect:', err.message);
+    return res.status(500).json({ message: 'Erreur serveur', detail: err.message });
+  }
+};
 
+/* section facturation afin de récupéerr la liste des immat existante  */
+// controllers/vehicleController.js
+exports.getByImmat = async (req, res) => {
+  try {
+    // 1) On récupère la valeur brute, uppercase
+    const raw = req.params.immat.trim().toUpperCase();
 
+    // 2) On nettoie pour ne garder que A–Z et 0–9
+    const cleaned = raw.replace(/[^A-Z0-9]/g, '');
 
+    // 3) On crée un pattern qui laisse passer n'importe quel non-alphanum
+    //    entre chaque caractère du cleaned
+    //    Exemple : "RS144174WDB6421S3"
+    //    => /^R[^A-Z0-9]*S[^A-Z0-9]*1...$/
+    const pattern = cleaned
+      .split('')
+      .map(ch => ch.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')) // échapper si jamais
+      .join('[^A-Z0-9]*');
+    const regex = new RegExp(`^${pattern}$`, 'i');
+
+    // 4) On cherche en base
+    const veh = await Vehicle.findOne(
+      { registrationNumber: { $regex: regex } },
+      'registrationNumber model assignedTo allocation'
+    ).lean();
+
+    if (!veh) {
+      return res.status(404).json({ message: 'Véhicule non trouvé' });
+    }
+
+    // 5) On renvoie tous les champs utiles
+    return res.status(200).json({
+      Immatriculation: veh.registrationNumber,
+      Type:            veh.model,
+      assignedTo:      veh.assignedTo,
+      allocation:      veh.allocation
+    });
+  } catch (err) {
+    console.error('Erreur getByImmat:', err);
+    return res.status(500).json({ message: 'Erreur serveur' });
+  }
+};

@@ -21,32 +21,56 @@ const registerVehicleInvoice = async (req, res) => {
   try {
     const data = req.body.data || req.body;
 
-    // Vérification de la présence des champs obligatoires
+    console.log('📥 registerVehicleInvoice payload:', data);
+
+    // 1) Ref obligatoire
     if (!data.Ref) {
       return res.status(400).json({ message: "Champs manquants : Ref." });
     }
-     // ─── Empêcher les doublons de référence ───
-   const existing = await Invoice.findOne({ Ref: data.Ref });
-  if (existing) {
-     return res.status(409).json({ message: "Une facture avec cette référence existe déjà." });
-   }
 
-    // ─── Conversion de la date (DD/MM/YYYY) ───
-    const [day, month, year] = data.Date.split('/');
-    const invoiceDate = new Date(Number(year), Number(month) - 1, Number(day));
+    // 2) Pas de doublon
+    const existing = await Invoice.findOne({ Ref: data.Ref });
+    if (existing) {
+      return res.status(409).json({ message: "Une facture avec cette référence existe déjà." });
+    }
 
-    // ─── Construction de l'objet à sauvegarder ───
+    // 3) Conversion de la date
+    let invoiceDate;
+    if (typeof data.Date === 'string' && data.Date.includes('/')) {
+      const [day, month, year] = data.Date.split('/').map(n => parseInt(n, 10));
+      invoiceDate = new Date(year, month - 1, day);
+    } else {
+      invoiceDate = new Date(data.Date);
+    }
+    if (isNaN(invoiceDate.getTime())) {
+      return res.status(400).json({ message: "Date invalide." });
+    }
+
+    // 4) Conversion du montant
+    let montantNum = 0;
+    if (data.Montant !== undefined) {
+      // enlève les espaces et remplace la virgule par un point
+      const cleaned = String(data.Montant)
+        .replace(/\s+/g, '')
+        .replace(',', '.');
+      montantNum = parseFloat(cleaned);
+      if (isNaN(montantNum)) {
+        return res.status(400).json({ message: "Montant invalide." });
+      }
+    }
+
+    // 5) Construction du document
     const parsedData = {
       Ref:            data.Ref,
       Date:           invoiceDate,
       Immatriculation: data.Immatriculation || '',
-      Type:           data.Type            || '',
-      Montant:        data.Montant,
-      Category:       data.Category        || '',
-      statut:         data.statut         || 'non payé'   // ← ajout du champ statut
+      Type:           data.Type || '',
+      Montant:        montantNum,
+      Category:       data.Category || '',
+      statut:         data.statut || 'non payé',
     };
 
-    // Sauvegarde dans MongoDB
+    // 6) Sauvegarde
     const newInvoice = new Invoice(parsedData);
     await newInvoice.save();
 
@@ -56,9 +80,10 @@ const registerVehicleInvoice = async (req, res) => {
     });
   } catch (error) {
     console.error("Erreur lors de l'enregistrement :", error);
-    return res.status(500).json({ message: "Erreur lors de l'enregistrement." });
+    return res.status(500).json({ message: error.message || "Erreur lors de l'enregistrement." });
   }
 };
+
 
 // gérer l'uplaod des factures 
 const handleInvoiceUpload = async (req, res) => {
@@ -119,7 +144,28 @@ const getInvoicePdf = async (req, res, next) => {
     next(err);
   }
 };
+const getInvoiceStats = async (req, res) => {
+  try {
+    const stats = await Invoice.aggregate([
+      {
+        $group: {
+          _id: "$Category",
+          totalMontant: { $sum: "$Montant" },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { count: -1 }
+      }
+    ]);
+
+    res.status(200).json(stats);
+  } catch (error) {
+    console.error("Erreur lors de l'agrégation des stats :", error);
+    res.status(500).json({ message: "Erreur lors de la récupération des statistiques." });
+  }
+};
 
 
 
-module.exports = { handleInvoiceUpload, getVehicleInvoices, registerVehicleInvoice,getInvoicePdf };
+module.exports = { handleInvoiceUpload, getVehicleInvoices, registerVehicleInvoice,getInvoicePdf ,getInvoiceStats};

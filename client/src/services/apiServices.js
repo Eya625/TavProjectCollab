@@ -7,6 +7,11 @@ const API_BASE_URL = 'http://localhost:3000/api';
 const dashboardApi = axios.create({
   baseURL: 'http://localhost:3000/api/dashboard'
 });
+
+// client dédié au Dashboard Finance
+const dashboardFinanceApi = axios.create({
+  baseURL: `${API_BASE_URL}/dashboard/finance/kpis`
+});
 const apiServices = {
   async getUserProfile(email) {
     try {
@@ -306,8 +311,8 @@ const apiServices = {
   },
   /* __________________ Partie Gestion des Véhicules __________________ */
 
-  // Récupérer la liste de tous les véhicules
-  async getVehicles() {
+  // Récupérer la liste de tous les véhicules dans l'interface de gestion des véhicules 
+ async getAllVehicles() {
     try {
       const response = await axios.get(`${API_BASE_URL}/vehicles`);
       return response.data;
@@ -367,22 +372,21 @@ const apiServices = {
     }
   },
   /*__________Partie facturation des véhicules (bassma) _________*/
-  async uploadVehicleInvoice(formData) {
-    const resp = await axios.post(`${API_BASE_URL}/billing/upload`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
+  // Déclaration comme méthode async dans un objet
+async getVehicleList() {
+    const resp = await axios.get(`${API_BASE_URL}/vehicles/select`);
     return resp.data;
   },
 
-  // Enregistrement des données extraites depuis le backend
-  async registerVehicleInvoice(invoiceData) {
-    const resp = await axios.post(
-      `${API_BASE_URL}/billing/register`,
-      invoiceData
+  // recherche { Immatriculation, Type }
+  async getVehicleByImmat(immat) {
+    const cleaned = immat.trim().toUpperCase().replace(/\s+/g, '');
+    const encoded = encodeURIComponent(cleaned);
+    const resp = await axios.get(
+      `${API_BASE_URL}/vehicles/by-immat/${encoded}`
     );
     return resp.data;
   },
-
   // Récupérer toutes les factures
   async getVehicleInvoices() {
     const resp = await axios.get(`${API_BASE_URL}/billing`);
@@ -393,7 +397,22 @@ const apiServices = {
     const resp = await axios.get(`${API_BASE_URL}/billing/${id}/pdf`);
     return resp.data.pdf; // ← récupère bien le champ “pdf”
   },
-  
+async uploadVehicleInvoice(formData) {
+  const resp = await axios.post(
+    `${API_BASE_URL}/billing/upload`,
+    formData,
+    { headers: { 'Content-Type': 'multipart/form-data' } }
+  );
+  return resp.data;  // ← ici on renvoie { success, data, filename }
+},
+
+    async registerVehicleInvoice(data) {
+    return axios.post(
+      `${API_BASE_URL}/billing`,
+      data
+    );
+  },
+
   async getInvoicesByImmat(immat) {
     // on interroge /billing?immat=… car ton back-end utilise /billing
     const resp = await axios.get(
@@ -553,10 +572,118 @@ const apiServices = {
       { params: filters }
     );
     return data;
-  }
-  
+  },
+
+
+                     /*______ Partie Analyse Finance _______   */
+                     
+  getFinanceVehicles()    { return dashboardFinanceApi.get('/vehicles').then(r => r.data) },
+  getTotalVehicles(v='')  { return dashboardFinanceApi.get('/totalVehicles',{ params:{ veh:v||undefined } }).then(r => r.data.count) },
+  getAllocation(v='')     { return dashboardFinanceApi.get('/allocation',{ params:{ veh:v||undefined } }).then(r => r.data) },
+  getTotalBilled(v='')    { return dashboardFinanceApi.get('/totalBilled',{ params:{ veh:v||undefined } }).then(r => r.data) },
+  getAvgInvoice(v='')     { return dashboardFinanceApi.get('/avgInvoice',{ params:{ veh:v||undefined } }).then(r => r.data) },
+  getTop5Vehicles(v='')   { return dashboardFinanceApi.get('/top5',{ params:{ veh:v||undefined } }).then(r => r.data) },
+  getCostByBranch(v='')   { return dashboardFinanceApi.get('/byBranch',{ params:{ veh:v||undefined } }).then(r => r.data) },
+  getInvoicesByMonth(v=''){ return dashboardFinanceApi.get('/invoicesByMonth',{ params:{ veh:v||undefined } }).then(r => r.data) },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 };
 export default apiServices;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Récupérer l'historique des actions
 export const getActionHistory = () => {

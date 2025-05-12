@@ -1,1 +1,8 @@
 text2num
+PyPDF2>=3.0.0
+pytesseract
+pdf2image
+ocrmypdf
+numpy
+Pillow
+# …autres dépendances de vos extractors…

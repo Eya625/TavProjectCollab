@@ -40,7 +40,7 @@
 
     <!-- Menu navigation -->
     <ul class="navbar-menu">
-      <li><router-link to="/Dashboard" exact>Dashboard</router-link></li>
+      <li><router-link to="/dashboard/finance" exact>Dashboard</router-link></li>
       <li><router-link to="/ManageVehicle">Gérer Véhicules</router-link></li>
       <li><router-link to="/facturation">Facturation</router-link></li>
       <li><router-link to="/historique">Historique</router-link></li>
