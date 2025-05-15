@@ -253,11 +253,7 @@ export default {
       try {
         await apiServices.deletePrinter(printer._id);
 
-        // 4. Mise à jour locale
-        this.printers = this.printers.filter((p) => p._id !== printer._id);
-        this.interventions = this.interventions.filter(
-          (i) => i.Printer_ID !== printer.Printer_ID
-        );
+        await this.fetchPrinters();
 
         // 5. Succès
         Swal.fire({
