@@ -74,7 +74,7 @@ mongoose
   .catch(err => console.error('MongoDB connection error:', err));
 
 // --- API Routes ---
-app.use('/api/user', userRoutes);
+app.use('/api', userRoutes);
 app.use('/api/consumption', consumptionRoutes); // partir facturation d'OLA
 app.use('/api', olaRoutes);
 app.use('/api/maintenance', curativeMaintenanceRoutes);
