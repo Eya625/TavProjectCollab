@@ -86,6 +86,12 @@ app.use('/api/billing/releves', detailsRelevesRoutes);
 app.use('/api/invoicespdf', invoicePDFRoutes);
 app.use('/api/dashboard/finance/kpis',dashboardFinRoutes);
 
+
+// vos middlewares (body-parser, cors, etc.)
+
+app.use('/api/invoices', require('./routes/billingRoutes'));
+app.use('/api/pos',      require('./routes/purchaseOrderRoutes'));
+
 // --- Socket.io Events ---
 io.on('connection', socket => {
   console.log('Client connecté via Socket.io');

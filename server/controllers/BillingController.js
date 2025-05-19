@@ -1,6 +1,7 @@
 const path = require('path'); 
 const fs = require('fs');
 const { extractInvoiceData } = require("../services/invoiceServices");
+const { processInvoicePdf }  = require("../services/billingvehicleextract");
 const Invoice = require("../models/BillingVehicle");
 
 // Chemin vers le dossier où les factures PDF sont stockées
@@ -9,7 +10,8 @@ const VEHICLE_INVOICES_DIR = path.join(__dirname, '../Uploads/vehicleInvoices');
 // Récupérer toutes les factures depuis MongoDB
 const getVehicleInvoices = async (req, res) => {
   try {
-    const invoices = await Invoice.find();  // Récupérer les factures depuis MongoDB
+    const invoices = await Invoice.find() 
+      .populate('po', 'poNumber createdDate supplier totalEstimated status')
     res.status(200).json(invoices);
   } catch (error) {
     res.status(500).json({ message: "Erreur lors de la récupération des factures." });
@@ -21,7 +23,7 @@ const registerVehicleInvoice = async (req, res) => {
   try {
     const data = req.body.data || req.body;
 
-    console.log('📥 registerVehicleInvoice payload:', data);
+    console.log(' registerVehicleInvoice payload:', data);
 
     // 1) Ref obligatoire
     if (!data.Ref) {
@@ -84,8 +86,7 @@ const registerVehicleInvoice = async (req, res) => {
   }
 };
 
-
-// gérer l'uplaod des factures 
+// gérer l'upload des factures 
 const handleInvoiceUpload = async (req, res) => {
   try {
     if (!req.file)
@@ -93,31 +94,42 @@ const handleInvoiceUpload = async (req, res) => {
 
     // 1) Extraire les données
     const extractedData = await extractInvoiceData(req.file.path);
-// 1.1) Détection de la catégorie si non fournie
-  extractedData.Category = extractedData.Category
-    || (!extractedData.Immatriculation && /pneu/i.test(JSON.stringify(extractedData)))
-      ? 'Pneus'
-      : (extractedData.Immatriculation ? 'Véhicule' : ''); 
+
+    // ───> 1bis) Persister en base : PO, BL & BillingVehicle
+    // (ne supprime aucune de vos lignes existantes)
+    const invoiceDoc = await processInvoicePdf(req.file.path);
+    await invoiceDoc.populate('po', 'poNumber createdDate supplier totalEstimated status');
+    // 1.1) Détection de la catégorie si non fournie
+    extractedData.Category = extractedData.Category
+      || (!extractedData.Immatriculation && /pneu/i.test(JSON.stringify(extractedData)))
+        ? 'Pneus'
+        : (extractedData.Immatriculation ? 'Véhicule' : ''); 
+    
     // 2) Construire le nouveau nom basé sur la référence extraite
     const ref = extractedData.Ref || '';
-    const safeRef = typeof ref === 'string' ? ref.replace(/[\\/:"*?<>|]+/g, '_') : 'facture_sans_ref';
+    const safeRef = typeof ref === 'string'
+      ? ref.replace(/[\\/:"*?<>|]+/g, '_')
+      : 'facture_sans_ref';
     const destFilename = `${safeRef}.pdf`;
-    const destPath = path.join(VEHICLE_INVOICES_DIR, destFilename);
+    const destPath     = path.join(VEHICLE_INVOICES_DIR, destFilename);
 
     // 3) Déplacer/renommer le fichier uploadé
     fs.renameSync(req.file.path, destPath);
 
     // 4) Retourner la data et le nouveau nom de fichier
     res.status(200).json({
-      success: true,
-      data: extractedData,
-      filename: destFilename    // on renvoie juste le file name
+      success:  true,
+      data:     extractedData,
+      filename: destFilename,
+      // Vous pouvez aussi renvoyer l'objet persisté si besoin :
+      invoice:  invoiceDoc
     });
   } catch (error) {
     console.error("Erreur extraction :", error);
     res.status(500).json({ success: false, error: error.message });
   }
 };
+
 // controllers/BillingController.js
 const getInvoicePdf = async (req, res, next) => {
   try {

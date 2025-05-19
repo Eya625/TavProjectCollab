@@ -1,37 +1,150 @@
-
-// Top5VehiclesChart.vue
 <template>
-  <div>
+  <div class="chart-card">
     <canvas ref="chartCanvas"></canvas>
   </div>
 </template>
+
 <script>
-import { Chart, BarController, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from 'chart.js';
-Chart.register(BarController, BarElement, CategoryScale, LinearScale, Tooltip, Legend);
+import {
+  Chart,
+  BarController,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+  Title
+} from 'chart.js';
+import apiService from '../services/apiServices';
+import { PALETTE } from '../charts/palette';
+
+Chart.register(BarController, BarElement, CategoryScale, LinearScale, Tooltip, Legend,Title);
+
 export default {
   name: 'Top5VehiclesChart',
-  props: { chartData: { type: Object, required: true } },
-  data() { return { chartInstance: null }; },
-  mounted() { this.renderChart(); },
+  props: {
+    veh: { type: String, default: '' }
+  },
+  data() {
+    return {
+      chartInstance: null,
+      chartData: {
+        labels: [],
+        datasets: [{
+          label: 'Top 5 véhicules',
+          data: [],
+          backgroundColor: [],
+          borderColor: [],
+          borderWidth: 1,
+          borderRadius: 6,
+          barPercentage: 0.6,
+          maxBarThickness: 40
+        }]
+      }
+    };
+  },
+  mounted() {
+    this.$watch(
+      () => this.veh,
+      v => this.fetchData(v),
+      { immediate: true }
+    );
+  },
   methods: {
+    async fetchData(v) {
+      try {
+        const raw = await apiService.getTop5Vehicles(v);
+        this.chartData.labels = raw.map(r => r.vehicle);
+        this.chartData.datasets[0].data = raw.map(r => r.total);
+        this.chartData.datasets[0].backgroundColor = raw.map((_, i) =>
+          PALETTE[i % PALETTE.length] + 'CC'
+        );
+        this.chartData.datasets[0].borderColor = raw.map((_, i) =>
+          PALETTE[i % PALETTE.length]
+        );
+        this.renderChart();
+      } catch (e) {
+        console.error('Top5VehiclesChart.fetchData error', e);
+      }
+    },
     renderChart() {
       if (this.chartInstance) this.chartInstance.destroy();
-      this.chartInstance = new Chart(this.$refs.chartCanvas, {
+      const ctx = this.$refs.chartCanvas.getContext('2d');
+      this.chartInstance = new Chart(ctx, {
         type: 'bar',
         data: this.chartData,
         options: {
           responsive: true,
+          maintainAspectRatio: false,
           animation: false,
-          plugins: { legend: { display: false } },
-          scales: { x: { grid: { display: false } }, y: { beginAtZero: true } }
+          layout: { padding: 16 },
+          plugins: {
+            title: {
+      display: true,
+      text: 'Top 5 Véhicules',
+      color: '#fff',
+      font: { size: 16, weight: '600' },
+      padding: { bottom: 10 }
+    },
+            legend: { display: true },
+            tooltip: {
+              backgroundColor: 'rgba(0,0,0,0.7)',
+              titleColor: '#fff',
+              bodyColor: '#fff',
+              callbacks: {
+                label: ctx => `${ctx.label}: ${ctx.parsed.y.toLocaleString()}`
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { color: '#fff', font: { size: 12 } },
+            title: {
+        display: true,
+        text: 'Coûts (TND)',
+        color: '#fff',
+        font: { size: 12 }
+      }
+    },
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(255,255,255,0.2)' },
+              ticks: { color: '#fff', font: { size: 12 } },
+              title: {
+        display: true,
+        text: 'Immatriculation',
+        color: '#fff',
+        font: { size: 12 }
+      }
+            }
+          }
         }
       });
     }
   },
-  watch: { chartData: { handler() { this.renderChart(); }, deep: true } },
-  beforeDestroy() { if (this.chartInstance) this.chartInstance.destroy(); }
+  beforeUnmount() {
+    if (this.chartInstance) this.chartInstance.destroy();
+  }
 };
 </script>
 <style scoped>
-canvas { max-width: 100%; }
+.chart-card {
+  width: 100%;
+  height: 350px;
+
+  /* Fond translucide et style existant */
+  background-color: rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+
+  /* ← Marges pour espacer chaque carte */
+  margin: 1.5rem 0.8rem;
+}
+
+canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
 </style>

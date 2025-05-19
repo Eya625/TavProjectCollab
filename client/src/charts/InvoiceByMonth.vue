@@ -1,38 +1,144 @@
-
-// InvoiceByMonthChart.vue
 <template>
-  <div>
+  <div class="chart-card">
     <canvas ref="chartCanvas"></canvas>
   </div>
 </template>
+
 <script>
-import { Chart, LineController, LineElement, PointElement, CategoryScale, LinearScale, Tooltip, Legend } from 'chart.js';
+import {
+  Chart,
+  LineController,
+  LineElement,
+  PointElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend
+} from 'chart.js';
+import apiService from '../services/apiServices';
+import { PALETTE } from '../charts/palette';
+
 Chart.register(LineController, LineElement, PointElement, CategoryScale, LinearScale, Tooltip, Legend);
+
 export default {
   name: 'InvoiceByMonthChart',
-  props: { chartData: { type: Object, required: true } },
-  data() { return { chartInstance: null }; },
-  mounted() { this.renderChart(); },
+  props: {
+    veh: { type: String, default: '' }
+  },
+  data() {
+    return {
+      chartInstance: null,
+      chartData: {
+        labels: [],
+        datasets: [{
+          label: 'Nombre de factures',
+          data: [],
+          borderColor: '',
+          backgroundColor: '',
+          borderWidth: 2,
+          pointBackgroundColor: '',
+          pointRadius: 4,
+          tension: 0.2,
+          fill: true
+        }]
+      }
+    };
+  },
+  mounted() {
+    this.$watch(
+      () => this.veh,
+      v => this.fetchData(v),
+      { immediate: true }
+    );
+  },
   methods: {
+    async fetchData(v) {
+      try {
+        const raw = await apiService.getInvoicesByMonth(v);
+        // raw = [{ month: '2025-01', count: 3 }, …]
+        this.chartData.labels = raw.map(r => r.month);
+        this.chartData.datasets[0].data = raw.map(r => r.count);
+
+        // Appliquer palette TAV
+        const col = PALETTE[0];
+        this.chartData.datasets[0].borderColor = col;
+        this.chartData.datasets[0].backgroundColor = col + '33';
+        this.chartData.datasets[0].pointBackgroundColor = col;
+
+        this.renderChart();
+      } catch (err) {
+        console.error('InvoiceByMonthChart.fetchData error', err);
+      }
+    },
     renderChart() {
-      if (this.chartInstance) this.chartInstance.destroy();
-      this.chartInstance = new Chart(this.$refs.chartCanvas, {
+      if (this.chartInstance) {
+        this.chartInstance.destroy();
+      }
+      const ctx = this.$refs.chartCanvas.getContext('2d');
+      this.chartInstance = new Chart(ctx, {
         type: 'line',
         data: this.chartData,
         options: {
           responsive: true,
+          maintainAspectRatio: false,
           animation: false,
-          plugins: { legend: { position: 'bottom' } },
-          scales: { x: { grid: { display: false } }, y: { beginAtZero: true } },
-          elements: { line: { tension: 0.2 }, point: { radius: 3 } }
+          layout: { padding: 16 },
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { color: '#fff', font: { size: 12 } }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(0,0,0,0.7)',
+              titleColor: '#fff',
+              bodyColor: '#fff',
+              callbacks: {
+                label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString()}`
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { color: '#fff', font: { size: 12 } }
+            },
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(255,255,255,0.2)' },
+              ticks: { color: '#fff', font: { size: 12 } }
+            }
+          },
+          elements: {
+            line: { tension: 0.2 },
+            point: { radius: 4 }
+          }
         }
       });
     }
   },
-  watch: { chartData: { handler() { this.renderChart(); }, deep: true } },
-  beforeDestroy() { if (this.chartInstance) this.chartInstance.destroy(); }
+  beforeUnmount() {
+    if (this.chartInstance) {
+      this.chartInstance.destroy();
+    }
+  }
 };
 </script>
 <style scoped>
-canvas { max-width: 100%; }
+.chart-card {
+  width: 100%;
+  /* Retire la hauteur fixe : la grille s’en charge */
+  height: 350px; 
+
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  /* ajoute un petit espace autour de chaque carte */
+  margin: 2rem 0.8rem 0 -0.1rem;
+}
+
+canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
 </style>

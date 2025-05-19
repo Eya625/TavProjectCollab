@@ -1,4 +1,4 @@
-// models/BillingVehicle.js (mis à jour)
+// models/BillingVehicle.js 
 const mongoose = require('mongoose');
 
 const invoiceSchema = new mongoose.Schema({
@@ -11,8 +11,19 @@ const invoiceSchema = new mongoose.Schema({
     type: String,
     enum: ['payé', 'non payé', 'partiellement payé'],
     default: 'non payé'
+  },
+  po: {
+    poNumber:        String,
+    createdDate:     Date,
+    supplier:        String,
+    destinataire:    String,
+    poInternalNumber:String,
+    demandeNumber:   String,
+    deliveryDate:    Date,
+    totalEstimated:  Number,
+    status:          { type: String, enum: ['open','closed'], default: 'open' }
   }
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('BillingVehicle', invoiceSchema, 'billingvehicles');
 
