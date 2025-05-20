@@ -5,4 +5,6 @@ pdf2image
 ocrmypdf
 numpy
 Pillow
+PyMuPDF>=1.20.0
+
 # …autres dépendances de vos extractors…

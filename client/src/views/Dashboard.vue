@@ -1,3 +1,4 @@
+
 <template>
   <div class="dashboard-container">
     <h1 class="dashboard-title"> Welcome to Your APP</h1>
@@ -12,7 +13,7 @@
           <h2>OLA ENERGY</h2>
           <p>Track and analyze fuel consumption</p>
         </div>
-        <router-link to="/OLADashboard" class="card-link">
+        <router-link to="/dashchart" class="card-link">
           Go to OLA Dashboard
         </router-link>
       </div>

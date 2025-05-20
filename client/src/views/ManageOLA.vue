@@ -254,6 +254,8 @@ import apiServices from '../services/apiServices';
 import NavBar from '../components/NavBar.vue';
 import OlaModal from '../components/OlaModal';
 import InvoiceForm from '../components/InvoiceForm.vue';
+import Swal from 'sweetalert2'
+
 import {
   groupDetailsByRegion,
   calculateGrandTotal
@@ -669,22 +671,36 @@ const monthTotals = computed(() => {
       return !card.totalConsumption || card.totalConsumption <= 0;
     };
 
-    const deleteCard = async (cardId, card) => {
-      if (!canDeletedCard(card)) {
-        showNotification('Deletion Not allowed', 'error');
-        return;
-      }
-      try {
-        await apiServices.deleteCard(cardId);
-        consumptionCards.value = consumptionCards.value.filter(
-          (c) => c._id !== cardId
-        );
-        showNotification('Card deleted successfully');
-      } catch (error) {
-        showNotification('Error deleting card', 'error');
-      }
-    };
+   const deleteCard = async (cardId, card) => {
+  // 1. Vérifier que l’icône est activée
+  if (!canDeletedCard(card)) {
+    showNotification('Deletion not allowed', 'error')
+    return
+  }
 
+  // 2. Ouvrir le modal de confirmation
+  const result = await Swal.fire({
+    title: 'Are You sure ?',
+    text: `Do you really want to delete the card for year ${card.year}?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it',
+    cancelButtonText: 'Non, Keep it'
+  })
+
+  // 3. Si l’utilisateur confirme, on supprime
+  if (result.isConfirmed) {
+    try {
+      await apiServices.deleteCard(cardId)
+      consumptionCards.value = consumptionCards.value.filter(c => c._id !== cardId)
+      showNotification('Card deleted successfully', 'success')
+    } catch (error) {
+      console.error(error)
+      showNotification('Error deleting card', 'error')
+    }
+  }
+  // 4. Si l’utilisateur annule, on ne fait rien (le modal se ferme tout seul)
+}
     /*  _________Fin Partie pour les cartes OLA______________  */
 
     // --- Partie Facturation ---

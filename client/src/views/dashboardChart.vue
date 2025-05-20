@@ -1,86 +1,93 @@
 <template>
-  <div class="dashboard">
-    <header class="dashboard-header">
-  <div class="logo left">
-    <img src="../assets/images/tav2.png" alt="TAV Tunisie" class="logo-tav animate-slide-left" />
-  </div>
+  <div class="layout">
+    <!-- Navbar à gauche -->
+    <NavBar :showGreenDot="false" />
 
-  <div class="header-center">
-    <h2 class="animate-fade-in">Administrative Fuel Control – TAV</h2>
-    <p class="slogan animate-slide-up">« Reliable Insights. Responsible Management.»</p>
-  </div>
+    <!-- Contenu principal -->
+    <div class="dashboard">
+      <header class="dashboard-header">
+        <div class="logo left">
+          <img src="../assets/images/tav2.png" alt="TAV Tunisie" class="logo-tav animate-slide-left" />
+        </div>
 
-  <div class="logo right">
-    <img src="../assets/images/olaenerg.png" alt="OLA Energy" class="logo-ola animate-slide-right" />
-  </div>
-</header>
+        <div class="header-center">
+          <h2 class="animate-fade-in">Administrative Fuel Control – TAV</h2>
+          <p class="slogan animate-slide-up">« Reliable Insights. Responsible Management.»</p>
+        </div>
 
-    <div class="dashboard-body">
-      <div class="dashboard-content">
-        <!-- Carte Totale en full-width -->
-        <TotalConsumptionCard
-          class="card-wide"
-          :year="year"
-          :selected-months="selectedMonths"
-          :selected-employee="selectedEmployee"
-          :selected-locations="selectedLocations"
-        />
+        <div class="logo right">
+          <img src="../assets/images/olaenerg.png" alt="OLA Energy" class="logo-ola animate-slide-right" />
+        </div>
+      </header>
 
-        <!-- Par location (pie) -->
-        <ByLocationChart
-          class="chart-pie"
-          :year="year"
-          :selected-employee="selectedEmployee"
-          :selected-locations="selectedLocations"
-          :colors="locationColors"
-        />
+      <div class="dashboard-body">
+        <div class="dashboard-content">
+          <!-- Carte Totale en full-width -->
+          <TotalConsumptionCard
+            class="card-wide"
+            :year="year"
+            :selected-months="selectedMonths"
+            :selected-employee="selectedEmployee"
+            :selected-locations="selectedLocations"
+          />
 
-        <!-- Par mois (line) -->
-        <ByMonthChart
-          class="chart-grid"
-          :year="year"
-          :selected-employee="selectedEmployee"
-          :selected-locations="selectedLocations"
-          :selected-months="selectedMonths"
-          :colors="monthColors"
-        />
+          <!-- Par location (pie) -->
+          <ByLocationChart
+            class="chart-pie"
+            :year="year"
+            :selected-employee="selectedEmployee"
+            :selected-locations="selectedLocations"
+            :colors="locationColors"
+          />
 
-        <!-- Top employés (bar) -->
-        <TopEmployeesChart
-          class="chart-grid"
-          :year="year"
-          :selected-employee="selectedEmployee"
-          :selected-locations="selectedLocations"
-          :colors="topEmpColors"
-        />
+          <!-- Par mois (line) -->
+          <ByMonthChart
+            class="chart-grid"
+            :year="year"
+            :selected-employee="selectedEmployee"
+            :selected-locations="selectedLocations"
+            :selected-months="selectedMonths"
+            :colors="monthColors"
+          />
 
-        <!-- YoY (table) -->
-        <YoYTable
-          class="chart-grid"
-          :selected-year="year"
-          :selected-employee="selectedEmployee"
-          :selected-locations="selectedLocations"
+          <!-- Top employés (bar) -->
+          <TopEmployeesChart
+            class="chart-grid"
+            :year="year"
+            :selected-employee="selectedEmployee"
+            :selected-locations="selectedLocations"
+            :colors="topEmpColors"
+          />
+
+          <!-- YoY (table) -->
+          <YoYTable
+            class="chart-grid"
+            :selected-year="year"
+            :selected-employee="selectedEmployee"
+            :selected-locations="selectedLocations"
+          />
+        </div>
+
+        <!-- Panneau de filtres sticky -->
+        <FilterPanels
+          class="filter-sticky"
+          :years="years"
+          :employees="employeeList"
+          :locations="locationList"
+          :months="monthList"
+          v-model:modelValue="year"
+          v-model:selected-employee="selectedEmployee"
+          v-model:selected-locations="selectedLocations"
+          v-model:selected-months="selectedMonths"
         />
       </div>
-
-      <!-- Panneau de filtres sticky -->
-      <FilterPanels
-        class="filter-sticky"
-        :years="years"
-        :employees="employeeList"
-        :locations="locationList"
-        :months="monthList"
-        v-model:modelValue="year"
-        v-model:selected-employee="selectedEmployee"
-        v-model:selected-locations="selectedLocations"
-        v-model:selected-months="selectedMonths"
-      />
     </div>
   </div>
 </template>
 
 <script>
 import { ref, onMounted } from 'vue';
+import NavBar from '../components/NavBar.vue';
 import api from '../services/apiServices';
 import FilterPanels from '../charts/FilterPanels.vue';
 import ByLocationChart from '../charts/ByLocationChart.vue';
@@ -90,8 +97,9 @@ import YoYTable from '../charts/YoYTable.vue';
 import TotalConsumptionCard from '../charts/TotalConsumptionCard.vue';
 
 export default {
-  name: 'Dashboard',
+  name: 'DashChart',
   components: {
+    NavBar,
     FilterPanels,
     ByLocationChart,
     ByMonthChart,
@@ -143,8 +151,13 @@ export default {
 };
 </script>
 <style scoped>
+.layout {
+  display: flex;
+}
+
 .dashboard {
   min-height: 100vh;
+  flex: 1;
   display: flex;
   flex-direction: column;
   background: url('../assets/images/arriplan.jpeg') center/cover no-repeat;
@@ -152,6 +165,8 @@ export default {
   padding: 1rem;
   box-sizing: border-box;
 }
+
+
 
 /* En-tête */
 .dashboard-header {

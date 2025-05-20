@@ -19,7 +19,7 @@
         <!-- Liste des liens de navigation -->
         <ul v-if="!isCollapsed">
           <li>
-            <router-link to="/OLADashboard" class="nav-item">
+            <router-link to="/dashchart" class="nav-item">
               <i class="fas fa-home"></i> <span>Dashboard</span>
             </router-link>
           </li>

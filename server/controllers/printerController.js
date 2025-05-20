@@ -45,10 +45,24 @@ exports.getPrinterById = async (req, res) => {
 };
 
 // Ajouter une nouvelle imprimante
+// controllers/printerController.js
+
+// Ajouter une nouvelle imprimante
 exports.addPrinter = async (req, res) => {
   try {
-    const printerData = req.body;
-    const newPrinter = new Printer(printerData);
+    const { Printer_ID } = req.body;
+
+    // 1. Vérifier si la reference existe déjà
+    const exists = await Printer.findOne({ Printer_ID: Printer_ID.trim() });
+    if (exists) {
+      // 2. Si oui, renvoyer un statut 409 Conflict
+      return res
+        .status(409)
+        .json({ error: 'Printer_ID already exists.' });
+    }
+
+    // 3. Sinon, création normale
+    const newPrinter = new Printer(req.body);
     await newPrinter.save();
     res.status(201).json(newPrinter);
   } catch (err) {

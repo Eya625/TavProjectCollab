@@ -10,7 +10,6 @@
       <header class="header">
         <h1>Printer Maintenance Management</h1>
         <div class="header-icons">
-          <font-awesome-icon icon="fa-user-circle" class="profile-icon" />
           <div class="notification-icon">
             <font-awesome-icon icon="fa-bell" />
           </div>
