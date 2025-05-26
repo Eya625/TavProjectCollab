@@ -1,21 +1,22 @@
-// controllers/BillingController.js
-const path = require('path');
-const fs = require('fs');
+const path = require('path');  // manipulation des chemins des fichiers
+const fs = require('fs');  
+// service d'extraction OCR
 const { extractInvoiceData } = require("../services/invoiceServices");
 const Invoice = require("../models/BillingVehicle");
 
-// Dossier de stockage des PDFs
+// Dossier de stockage des des factures PDFs
 const VEHICLE_INVOICES_DIR = path.join(__dirname, '../Uploads/vehicleInvoices');
 
 // 1) Upload & extraction + renommage + sauvegarde
 const handleInvoiceUpload = async (req, res) => {
   try {
     console.log("[upload] req.file =", req.file);
+    // vérifie si un fichier a été envoyé
     if (!req.file) {
       return res.status(400).json({ success: false, message: "Aucun fichier PDF fourni (champ 'pdf')." });
     }
 
-    // 1.1 Extraction
+    // 1.1 Extraction des données via le service OCR
     const result = await extractInvoiceData(req.file.path);
     console.log("[upload] service result =", result);
     if (!result.success) {
@@ -65,27 +66,15 @@ const handleInvoiceUpload = async (req, res) => {
     const statut = validStatuts.includes(extractedData.statut)
       ? extractedData.statut
       : 'non payé';
-
-    // 1.8 Création du document MongoDB
-    const newInvoice = new Invoice({
-      Ref:            extractedData.Ref,
-      Date:           invoiceDate,
-      Immatriculation: extractedData.Immatriculation,
-      Type:           extractedData.Type,
-      Montant:        montantNum,
-      Category:       extractedData.Category,
-      statut:         statut,
-    });
-    await newInvoice.save();
-
-    // 1.9 Réponse
+ // 1.8 On ne crée plus de document ici, on renvoie juste les données extraites
     return res.status(200).json({
       success:   true,
       data:      extractedData,
       filename:  destName,
-      invoice:   newInvoice,
       extractor: extractor
     });
+    
+
 
   } catch (error) {
     console.error("[upload] Erreur interne :", error);

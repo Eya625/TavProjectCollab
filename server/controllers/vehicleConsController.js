@@ -1,63 +1,57 @@
-// vehicleConsController Invoices.js
 
-//const upload = multer(); // passer les données pour l'upgrade
+
+const multer = require('multer'); // gestionnaire d'upload de fichiers -> middleware dans express
 const Invoice = require('../models/Invoice');
 const ActionHistory = require('../models/ActionHistory');
-const InvoicePDF = require('../models/InvoicePDF');
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+const InvoicePDF = require('../models/InvoicePDF'); // modele enregistre la version PDF
+const path = require('path'); // manipulation des fichiers
+const fs = require('fs'); //file system (lire/ écrire/ supprimer) des fichiers locaux
 
-// Historique des actions en mémoire
+// Historique des actions en mémoire : traçage de toute opération
 const logAction = (type, entity, data) => {
   const action = new ActionHistory({
     type,
     entity,
     data
   });
-
   // Enregistrer l'action dans la base de données
   action
-    .save()
+    .save() // retourne une promesse en cas de succ ou err
     .then(() => {
-      console.log("Action enregistrée dans l'historique");
+      console.log("action saved ");
     })
     .catch((err) => {
       console.error(
-        "Erreur lors de l'enregistrement de l'action historique :",
+        "error while saving Action history :",
         err
       );
     });
 };
 
 /*                partie facturation           */
+// handler(gestionnaire) de la route get / invoice ex 
 exports.getAllInvoices = async (req, res) => {
   try {
-    console.log('Requête reçue pour récupérer les factures');
     const invoices = await Invoice.find();
     console.log('Factures récupérées :', invoices);
     res.status(200).json(invoices);
   } catch (error) {
-    console.error('Erreur lors de la récupération des factures:', error);
     res
       .status(500)
-      .json({ message: 'Erreur lors de la récupération des factures', error });
+      .json({ message: 'Erreur fetching invoices', error });
   }
 };
+
 exports.addInvoice = async (req, res) => {
   try {
-    console.log('Données reçues :', req.body); // Ajoute ce log pour vérifier les données envoyées
-
+    console.log('Added Data :', req.body); //  vérifier les données envoyées dans le console
     const invoice = new Invoice(req.body);
     const savedInvoice = await invoice.save();
     logAction('add', 'invoice', savedInvoice);
-
     res.status(201).json(savedInvoice);
   } catch (error) {
-    console.error("Erreur lors de l'ajout :", error); // Log plus détaillé
-    res
-      .status(500)
-      .json({ message: "Erreur lors de l'ajout", error: error.message });
+    console.error("Error while Adding:", error); 
+    res.status(500).json({ error: "Error while Adding "});
   }
 };
 
@@ -70,42 +64,43 @@ exports.updateInvoice = async (req, res) => {
       { new: true }
     );
     if (!updatedInvoice)
-      return res.status(404).json({ message: 'Facture non trouvée' });
+      return res.status(404).json({ message: 'invoice Not found ' });
 
     logAction('update', 'invoice', updatedInvoice);
     res.status(200).json(updatedInvoice);
   } catch (error) {
-    res.status(500).json({ message: 'Erreur lors de la mise à jour', error });
+    res.status(500).json({ message: 'Error while Updating ', error });
   }
 };
-
-// Supprimer une facture
+//Supprimer une facture
 exports.deleteInvoice = async (req, res) => {
   try {
     const deletedInvoice = await Invoice.findByIdAndDelete(req.params.id);
     if (!deletedInvoice)
-      return res.status(404).json({ message: 'Facture non trouvée' });
+      return res.status(404).json({ message: 'Invoice not Found' });
 
     logAction('delete', 'invoice', deletedInvoice);
-    res.status(200).json({ message: 'Facture supprimée' });
+    res.status(200).json({ message: 'Invoice deleted' });
   } catch (error) {
-    res.status(500).json({ message: 'Erreur lors de la suppression', error });
+    res.status(500).json({ message: 'Error deleting Invoice', error });
   }
 };
+
 // Récupérer tout l'historique des actions
 exports.getActionHistory = async (req, res) => {
   try {
     const actions = await ActionHistory.find().sort({ timestamp: -1 }); // Trier par date décroissante
     res.status(200).json(actions);
   } catch (error) {
-    console.error("Erreur lors de la récupération de l'historique :", error);
-    res.status(500).json({ message: 'Erreur serveur' });
+    console.error("Error while fetching action history :", error);
+    res.status(500).json({ message: 'Server Error' });
   }
 };
 
+
 /*  __________ Uploading des factures OLA mensuelles */
 
-// on va s'assurer <ue le dossier existe
+// on va s'assurer que le dossier existe
 const baseUploadDir = path.join(__dirname, '..', 'Uploads');
 const olaDir = path.join(baseUploadDir, 'OLAMonthInvoices');
 if (!fs.existsSync(olaDir)) {
@@ -114,18 +109,21 @@ if (!fs.existsSync(olaDir)) {
 }
 
 const storage = multer.diskStorage({
+  // fonction qui indique où on stocke le fichier (olaDir)
   destination: (req, file, cb) => {
     cb(null, olaDir);
   },
+  // on préserve le nom originale du fichier 
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
     // on préserve originalname après le suffixe
     cb(null, uniqueSuffix + '-' + file.originalname);
   }
 });
+// autorisation seulement des pdfs
 const fileFilter = (req, file, cb) => {
   if (file.mimetype === 'application/pdf') cb(null, true);
-  else cb(new Error('Only PDF files are allowed'), false);
+  else cb(new Error('format erronée'), false);
 };
 const limits = { fileSize: 5 * 1024 * 1024 }; // 5 Mo max
 
@@ -137,9 +135,11 @@ exports.uploadMiddleware = multer({ storage, fileFilter, limits }).single(
 // ------------------ Méthodes CRUD PDF ------------------
 
 // Upload d’un PDF de facturation
+// création de middleware multer (gestionnaire)
 exports.uploadPdf = async (req, res, next) => {
   try {
-    if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
+    if (!req.file) 
+      return res.status(400).json({ message: 'No file uploaded' });
 
     const newPdf = new InvoicePDF({
       filename:req.file.originalname,
@@ -176,8 +176,6 @@ exports.getPdfUrl = async (req, res, next) => {
       path.join(__dirname, '..'),
       pdf.path
     ).replace(/\\/g, '/');  
-    // relPath === 'uploads/OLAMonthInvoices/<votre-fichier>.pdf'
-
     const url = `${req.protocol}://${req.get('host')}/${relPath}`;
     res.status(200).json({ url });
 

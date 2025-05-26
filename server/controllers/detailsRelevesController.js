@@ -20,8 +20,11 @@ const monthNames = [
 
 async function uploadDetailsReleves(req, res, next) {
   try {
+    // a) récupération de chemin du fichier transféré
     const filePath = req.file.path;
+    // b) appel au service d'extraction(regex / ...)
     const result = await extractFromPdf(filePath);
+    // c) on renvoit l'objet (period/ data) au front
     return res.status(200).json(result);
   } catch (err) {
     console.error("Erreur lors de l'upload des relevés:", err);
@@ -29,26 +32,54 @@ async function uploadDetailsReleves(req, res, next) {
   }
 }
 
+// validation et synchronsation en base MongoDB
 async function saveReleves(req, res) {
   try {
-    // 1) Valide et log le payload
+    // 1) Validation du payload
     const { period, data } = req.body;
     if (typeof period !== 'string' || !Array.isArray(data)) {
-      console.error('Payload invalide:', req.body);
+      console.error('Invalid payload:', req.body);
       return res
         .status(400)
-        .json({ error: 'Payload invalide', body: req.body });
+        .json({ error: 'invalid_payload', body: req.body });
     }
 
-    // 2) Détermine l'année et le mois
+    // 2) Décodage de l'année et du mois
     const [yearStr, monthStr] = period.split('-');
     const year     = parseInt(yearStr, 10);
     const monthKey = monthNames[parseInt(monthStr, 10) - 1];
+    if (!monthKey) {
+      console.error('Invalid month extracted:', period);
+      return res
+        .status(400)
+        .json({ error: 'invalid_period', message: `Cannot parse month from ${period}` });
+    }
 
-    // 3) Récupère ou crée le doc pour cette année
+    // 3) recherche du doucment annuel existant
     let doc = await OlaConsumption.findOne({ year });
+
+    // 3a) vérification des doublons : si ce mois à déjà été importé
+    if (doc) {
+      const alreadyUploaded = doc.details.some(d => {
+        // handle Map vs object
+        const val = d.consumptions instanceof Map
+          ? d.consumptions.get(monthKey)
+          : d.consumptions[monthKey];
+        return Number(val) > 0;
+      });
+      if (alreadyUploaded) {
+        // 409 Conflict: month already uploaded
+        return res
+          .status(409)
+          .json({
+            error: 'duplicate_upload',
+            message: `Details for ${monthKey} ${year} have already been uploaded.`
+          });
+      }
+    }
+
+    // 4) Création du document si c'est la première fois pour cette année
     if (!doc) {
-      // Initialise avec defaultApsDetails, en convertissant consumptions → Map
       doc = new OlaConsumption({
         year,
         details: defaultApsDetails.map(d => ({
@@ -58,37 +89,38 @@ async function saveReleves(req, res) {
       });
     }
 
-    // 4) Pour chaque ligne extraite, mets à jour la carte correspondante
+    // 5) pour chaque ligne extraite, mettre à jour ou ajouter un détail
     for (const entry of data) {
+      //a) on nettoie les 0 du num carte 
       const cleanCard = entry.cardNumber.replace(/^0+/, '');
       const total     = Number(entry.total) || 0;
-
+      // b) recherche d'un détail existant
       const detail = doc.details.find(d =>
         d.card_number.replace(/^0+/, '') === cleanCard
       );
 
       if (detail) {
-        // Met à jour la Map du mois, sans toucher à detail.employe
+        // Mise à jour de la Map de consommation pour ce mois 
         if (!(detail.consumptions instanceof Map)) {
           detail.consumptions = new Map(
             Object.entries(detail.consumptions || {})
           );
         }
         detail.consumptions.set(monthKey, total);
-
       } else {
-        // === TEST MINIMAL : on ajoute uniquement card_number et employe ===
+        // création d'un nv détail minimal 
         doc.details.push({
           card_number: cleanCard,
-          employe:     entry.employe || ''
+          employe:     entry.employe || '',
+          consumptions: new Map([[monthKey, total]])
         });
       }
     }
 
-    // 5) Indique à Mongoose que details (et donc chaque Map) a changé
+    // 6) Informer mongoose que la propriété 'details' à changé
     doc.markModified('details');
 
-    // 6) Recalcul du total annuel à partir des Map
+    // 7) Recalculer le total annuel
     doc.totalConsumption = doc.details.reduce((sum, d) => {
       if (d.consumptions instanceof Map) {
         for (const v of d.consumptions.values()) {
@@ -98,21 +130,27 @@ async function saveReleves(req, res) {
       return sum;
     }, 0);
 
-    // 7) Sauvegarde finale
+    // 8) Final save
     await doc.save();
-    console.log(`Sauvegarde terminée pour l'année ${year}`);
+    console.log(`Save completed for year ${year}`);
+
+    // 9) Return success message with month and year
     return res
       .status(200)
-      .json({ message: 'Relevés enregistrés avec succès.' });
+      .json({
+        success: true,
+        message: `Successfully uploaded ${monthKey} ${year} details.`
+      });
 
   } catch (err) {
-    console.error('Erreur saveReleves :', err);
+    console.error('Error in saveReleves:', err);
     return res.status(500).json({
-      error:   'Erreur interne serveur.',
+      error:   'server_error',
       message: err.message
     });
   }
 }
+
 
 module.exports = {
   uploadDetailsReleves,
