@@ -1,15 +1,20 @@
-#!/usr/bin/env python3
 import json
 import sys
 import os
 from datetime import datetime
 
-# Chemins
+# Chemins relatifs vers les deux extracteurs
 BASE_DIR      = os.path.dirname(os.path.abspath(__file__))
 EXTRACTOR_PY  = os.path.join(BASE_DIR, "extractor.py")
 EXTRACTOR2_PY = os.path.join(BASE_DIR, "extractor2.py")
 
 def load_func(path, name):
+    """
+    Charge dynamiquement une fonction nommée `name` depuis le fichier `path`.
+    - Vérifie que le fichier existe.
+    - Utilise importlib pour importer le module depuis un chemin arbitraire.
+    - Renvoie la fonction si trouvée, sinon None.
+    """
     if not os.path.exists(path):
         sys.stderr.write(f"[loader] Fichier non trouvé : {path}\n")
         return None
@@ -24,6 +29,12 @@ def load_func(path, name):
         return None
 
 def to_iso(date_str):
+    """
+    Convertit une date au format jour-mois-année (avec plusieurs variantes de séparateurs)
+    en chaîne ISO 8601 (YYYY-MM-DDTHH:MM:SSZ).
+    - Essaie successivement les formats : %d-%b-%Y, %d/%m/%Y, %d-%m-%Y.
+    - Si aucun ne correspond, renvoie None.
+    """
     for fmt in ("%d-%b-%Y", "%d/%m/%Y", "%d-%m-%Y"):
         try:
             return datetime.strptime(date_str, fmt).isoformat() + 'Z'
@@ -32,6 +43,13 @@ def to_iso(date_str):
     return None
 
 def main(pdf_path):
+    """
+    Script maître qui orchestre l’utilisation de deux extracteurs :
+    1) extractor.py (parse_invoice)
+    2) extractor2.py (main)
+    Pour obtenir, si possible, ref, date, immatriculation et montant TTC.
+    Retourne un JSON avec success + data ou success=False + error.
+    """
     sys.stderr.write(f"[master] Chemin reçu : {pdf_path}\n")
     if not os.path.exists(pdf_path):
         print(json.dumps({
@@ -44,10 +62,10 @@ def main(pdf_path):
     parse_inv = load_func(EXTRACTOR_PY,  "parse_invoice")
     parse_tyr = load_func(EXTRACTOR2_PY, "main")
 
-    inv = {}
-    extractor_used = None
+    inv = {} # dictionnaire intermédiaire pour les résultats
+    extractor_used = None   # nom du script qui a réussi l'extraction
 
-    # 1) Tentative avec extractor.py
+    # 1) Essai avec extractor.py (parse_invoice)
     if parse_inv:
         try:
             result_inv = parse_inv(pdf_path) or {}
@@ -72,7 +90,7 @@ def main(pdf_path):
         except Exception as e:
             sys.stderr.write(f"[master] Erreur parse_invoice : {e}\n")
 
-    # 2) Fallback vers extractor2.py si nécessaire
+    # 2) Si extractor.py n’a pas donné satisfaction, fallback sur extractor2.py
     if not extractor_used and parse_tyr:
         try:
             result_tyr = parse_tyr(pdf_path) or {}
@@ -80,7 +98,7 @@ def main(pdf_path):
             for field in ("ref", "Ref", "immatriculation", "total_ttc", "Montant"):
                 if isinstance(result_tyr.get(field), str) and result_tyr[field].strip().upper() == "N/A":
                     result_tyr[field] = ""
-            # On accepte le fallback si on a au moins ref et montant
+            # On exige au moins la référence et le montant
             raw_ref_t = (result_tyr.get("ref") or result_tyr.get("Ref") or "").strip()
             raw_ttc_t = result_tyr.get("total_ttc") or result_tyr.get("Montant") or result_tyr.get("montant")
             if raw_ref_t and raw_ttc_t:
@@ -96,7 +114,7 @@ def main(pdf_path):
         except Exception as e:
             sys.stderr.write(f"[master] Erreur parse_tyr : {e}\n")
 
-    # 3) Validation finale (seulement ref + montant)
+    # 3) Validation finale : on doit avoir une ref non vide et un montant > 0
     ref_raw = inv.get("ref", "").strip()
     montant_raw = inv.get("total_ttc") if inv.get("total_ttc") is not None else inv.get("montant", 0)
     try:
@@ -111,16 +129,16 @@ def main(pdf_path):
         }, ensure_ascii=False))
         return
 
-    # 4) On reconstitue immatriculation pour le payload
+    # 4) Prépare l'immatriculation pour le payload
     immat = inv.get("immatriculation", "").strip()
 
-    # 5) Conversion de la date en ISO
+    # 5) Conversion de la date en format ISO, ou fallback sur l'heure UTC courante
     date_iso = None
     if inv.get("date"):
         date_iso = to_iso(inv.get("date"))
     date_iso = date_iso or (datetime.utcnow().isoformat() + "Z")
 
-    # 6) Construction du payload final
+    # 6) Assemblage du payload final
     data = {
         "Ref":             ref_raw,
         "Date":            date_iso,
@@ -130,6 +148,7 @@ def main(pdf_path):
         "statut":          inv.get("statut", "non payé")
     }
 
+    # 7) Sortie JSON avec succès
     output = {
         "success":   True,
         "data":      data,
@@ -139,6 +158,7 @@ def main(pdf_path):
 
 
 if __name__ == "__main__":
+    # Entrée en ligne de commande : on attend exactement un argument (le chemin PDF)
     if len(sys.argv) != 2:
         sys.stderr.write("Usage: extractor_master.py <file.pdf>\n")
         sys.exit(1)

@@ -1,4 +1,3 @@
-// controllers/detailsRelevesController.js
 const { extractFromPdf } = require('../services/detailsReleves');
 const OlaConsumption = require('../models/OlaConsumption');
 const defaultApsDetails = require('../data/defaultApsDetails.json');
