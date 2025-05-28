@@ -26,7 +26,6 @@ const {
   getByMonth,
   getTopEmployees,
   getYoYFuelVariation,
-  getInvoiceDetails,
   getAllEmployees,
   getAllLocations,
   getAllYears,
@@ -37,7 +36,6 @@ router.get('/by-location',    getByLocation);
 router.get('/by-month',       getByMonth);
 router.get('/top-employees',  getTopEmployees);
 router.get('/yoy-fuel-variation',getYoYFuelVariation);
-router.get('/invoice-details',getInvoiceDetails);
 router.get('/employees', getAllEmployees);
 router.get('/locations', getAllLocations);      
 router.get('/years', getAllYears);

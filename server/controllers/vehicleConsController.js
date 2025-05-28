@@ -43,7 +43,7 @@ exports.getAllInvoices = async (req, res) => {
 
 exports.addInvoice = async (req, res) => {
   try {
-    console.log('Added Data :', req.body); //  vérifier les données envoyées dans le console
+    //console.log('Added Data :', req.body); //  vérifier les données envoyées dans le console
     const invoice = new Invoice(req.body);
     const savedInvoice = await invoice.save();
     logAction('add', 'invoice', savedInvoice);
