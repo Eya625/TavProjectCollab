@@ -13,7 +13,7 @@
     <main class="main">
       <!-- Header -->
       <div class="main-header">
-        <h1><i class="fas fa-chart-line"></i> Tableau de bord financier</h1>
+        <h1><i class="fas fa-chart-line"></i>  Financial Dashboard</h1>
         <time>{{ today }}</time>
       </div>
 
@@ -22,15 +22,17 @@
         <div class="card kpi-card">
           <div class="card-header kv-blue"><i class="fas fa-car"></i></div>
           <div class="card-body">
-            <h3>Total véhicules</h3>
+            <h3>Vehicle Totals</h3>
             <p class="kpi-value">{{ totalVehicleCount.toLocaleString('fr-FR') }}</p>
           </div>
         </div>
         <div class="card kpi-card">
           <div class="card-header kv-lightblue"><i class="fas fa-euro-sign"></i></div>
           <div class="card-body">
-            <h3>Total facturé (TND)</h3>
-            <p class="kpi-value">{{ totalBilledSum.toLocaleString('fr-FR') }}</p>
+            <h3>Total Billed (TND)</h3>
+<p class="kpi-value">
+  {{ totalBilledSum.toLocaleString('en-US') }}
+</p>
           </div>
         </div>
       </div>
@@ -70,28 +72,41 @@ async function loadKPIs() {
 watch(selectedVehicle, loadKPIs);
 onMounted(loadKPIs);
 
-const today = new Date().toLocaleDateString('fr-FR', {
+const today = new Date().toLocaleDateString('en-US', {
   weekday: 'long',
   year: 'numeric',
   month: 'long',
   day: 'numeric'
 });
 </script>
-
 <style scoped>
 .dashboard-root {
   display: flex;
   min-height: 100vh;
   font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg,
+    rgba(12, 20, 44, 0.8),
+    rgba(4, 12, 32, 0.8));
+  animation: backgroundShift 15s ease infinite;
+}
+
+@keyframes backgroundShift {
+  0%   { background: linear-gradient(135deg, rgba(12,20,44,0.8), rgba(4,12,32,0.8)); }
+  50%  { background: linear-gradient(135deg, rgba(4,12,32,0.8), rgba(12,20,44,0.8)); }
+  100% { background: linear-gradient(135deg, rgba(12,20,44,0.8), rgba(4,12,32,0.8)); }
 }
 
 /* Sidebar */
 .sidebar {
   width: 230px;
-  background: rgba(0, 0, 0, 0.9);
-  color: #fff;
+  background: rgba(8, 16, 36, 0.95);
+  color: #e0f7fa;
   padding: 1.5rem;
-  box-shadow: 4px 0 12px rgba(0,0,0,0.2);
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.7);
+  transition: background 0.3s ease;
+}
+.sidebar:hover {
+  background: rgba(10, 24, 48, 0.95);
 }
 .filter-header {
   display: flex;
@@ -101,19 +116,26 @@ const today = new Date().toLocaleDateString('fr-FR', {
 .filter-header i {
   font-size: 1.6rem;
   margin-right: 0.75rem;
+  color: #81d4fa;
+  transition: color 0.3s;
+}
+.filter-header:hover i {
+  color: #b2ebf2;
 }
 .filter-header h2 {
   margin: 0;
   font-size: 1.3rem;
   font-weight: 600;
+  color: #b2ebf2;
 }
 
 /* Main */
 .main {
   flex: 1;
   padding: 2.5rem;
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(4px);
+  background: rgba(2, 8, 20, 0.5);
+  backdrop-filter: blur(6px);
+  animation: fadeIn 1s ease-out;
 }
 
 /* Header */
@@ -127,12 +149,12 @@ const today = new Date().toLocaleDateString('fr-FR', {
   display: flex;
   align-items: center;
   font-size: 2rem;
-  color: #2E86AB;
+  color: #4dd0e1;
   font-weight: 600;
 }
 .main-header time {
   font-style: italic;
-  color: #ccc;
+  color: #90a4ae;
 }
 
 /* KPI Cards */
@@ -143,14 +165,16 @@ const today = new Date().toLocaleDateString('fr-FR', {
   margin-bottom: 2.5rem;
 }
 .kpi-card {
-  background: rgba(255,255,255,0.9);
+  background: rgba(6, 16, 36, 0.6);
+  border: 1px solid rgba(77, 182, 172, 0.3);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-  transition: transform 0.2s;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
+  transition: transform 0.3s, background 0.3s;
 }
 .kpi-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-6px);
+  background: rgba(6, 16, 36, 0.8);
 }
 .card-header {
   height: 70px;
@@ -158,10 +182,10 @@ const today = new Date().toLocaleDateString('fr-FR', {
   align-items: center;
   justify-content: center;
   font-size: 1.9rem;
-  color: #fff;
+  color: #b2ebf2;
 }
-.kv-blue { background-color: #2E86AB; }
-.kv-lightblue { background-color: #3498DB; }
+.kv-blue    { background-color: rgba(4, 116, 144, 0.8); }
+.kv-lightblue { background-color: rgba(3, 155, 229, 0.8); }
 .card-body {
   padding: 1.25rem;
   text-align: center;
@@ -170,33 +194,37 @@ const today = new Date().toLocaleDateString('fr-FR', {
   margin-top: 0.5rem;
   font-size: 2.4rem;
   font-weight: 700;
-  color: #1B4F72;
+  color: #80deea;
 }
 
 /* Charts Grid */
 .charts-grid {
-  display: grid;  
-  /* colonnes adaptatives comme avant */
+  display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  /* espacement horizontal et vertical entre les cellules */
-  gap: 1.5rem;    
-  /* si vous voulez un peu de marge intérieure autour de la grille */
-  padding: 1rem;  
+  gap: 1.5rem;
+  padding: 1rem;
 }
-
 
 /* Chart Card */
 .chart-card {
-     
-  /* conservez vos styles visuels */
-  background-color: rgba(0, 0, 0, 0.548);
+  background: rgba(8, 16, 36, 0.6);
   border-radius: 12px;
   padding: 16px;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.5);
-
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.8);
   display: flex;
   flex-direction: column;
+  animation: cardFadeIn 0.8s ease-out;
+  transition: background 0.3s;
 }
+.chart-card:hover {
+  background: rgba(8, 16, 36, 0.8);
+}
+
+@keyframes cardFadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
 /* Canvas à l’intérieur de la carte */
 .chart-card canvas {
   flex: 1;

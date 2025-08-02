@@ -146,7 +146,8 @@ exports.getByImmat = async (req, res) => {
     // 1) Récupération et normalisation de la saisie
     //    - req.params.immat : la chaîne fournie dans l'URL
     //    - .trim() : supprime les espaces en début et fin
-    //    - .toUpperCase() : uniformise en majuscules pour ignorer la casse    const raw = req.params.immat.trim().toUpperCase();
+    //    - .toUpperCase() : uniformise en majuscules pour ignorer la casse
+    const raw = req.params.immat.trim().toUpperCase();
 
     // 2) Nettoyage : ne conserver que les caractères A–Z et 0–9
     //    Cela supprime tout ce qui pourrait gêner la regex (espaces, tirets, accents…)
@@ -166,11 +167,11 @@ exports.getByImmat = async (req, res) => {
     //    - 'i' : rend la recherche insensible à la casse (déjà normalisée, mais c'est une bonne pratique)
     const regex = new RegExp(`^${pattern}$`, 'i');
 
- // 5) Recherche en base avec Mongoose
+    // 5) Recherche en base avec Mongoose
     //    - Critère : registrationNumber correspond à la regex
     //    - Projection : ne récupérer que les champs utiles
     //    - .lean() : renvoyer un objet JS brut (POJO) plus léger qu’un document Mongoose
-        const veh = await Vehicle.findOne(
+    const veh = await Vehicle.findOne(
       { registrationNumber: { $regex: regex } },
       'registrationNumber model assignedTo allocation'
     ).lean();

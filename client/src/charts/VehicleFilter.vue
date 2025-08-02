@@ -1,8 +1,8 @@
 <template>
   <div class="filter-veh">
-    <label><i class="fas fa-car"></i> Véhicule</label>
+    <label><i class="fas fa-car"></i> Vehicles</label>
     <select v-model="localSel">
-      <option value="">Tous</option>
+      <option value="">All</option>
       <option
         v-for="v in vehicles"
         :key="v.registrationNumber"

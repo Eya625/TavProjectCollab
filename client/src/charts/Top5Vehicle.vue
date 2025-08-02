@@ -31,7 +31,7 @@ export default {
       chartData: {
         labels: [],
         datasets: [{
-          label: 'Top 5 véhicules',
+          label: 'Top 5 vehicles',
           data: [],
           backgroundColor: [],
           borderColor: [],
@@ -81,7 +81,7 @@ export default {
           plugins: {
             title: {
       display: true,
-      text: 'Top 5 Véhicules',
+      text: 'Top 5 vehicles',
       color: '#fff',
       font: { size: 16, weight: '600' },
       padding: { bottom: 10 }
@@ -102,7 +102,7 @@ export default {
               ticks: { color: '#fff', font: { size: 12 } },
             title: {
         display: true,
-        text: 'Coûts (TND)',
+        text: 'Costs (TND)',
         color: '#fff',
         font: { size: 12 }
       }
@@ -113,7 +113,7 @@ export default {
               ticks: { color: '#fff', font: { size: 12 } },
               title: {
         display: true,
-        text: 'Immatriculation',
+        text: 'Registration Number',
         color: '#fff',
         font: { size: 12 }
       }
@@ -132,14 +132,11 @@ export default {
 .chart-card {
   width: 100%;
   height: 350px;
-
   /* Fond translucide et style existant */
-  background-color: rgba(255,255,255,0.1);
+  background-color: rgba(2, 2, 20, 0.763);
   border-radius: 12px;
   padding: 16px;
   box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-
-  /* ← Marges pour espacer chaque carte */
   margin: 1.5rem 0.8rem;
 }
 

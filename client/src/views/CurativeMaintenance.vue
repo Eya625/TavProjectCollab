@@ -73,6 +73,19 @@
             >
           </div>
         </div>
+         <div class="card">
+          <div class="card-icon">
+            <font-awesome-icon icon="fa-coins" />
+          </div>
+          <div class="card-content">
+            <h2>printer with most interventions</h2>
+            <p>{{ totalCostThisMonth }} DT</p>
+            <small
+              >Somme des coûts du Mois
+              {{ new Date().toLocaleString('fr', { month: 'long' }) }}</small
+            >
+          </div>
+        </div>
       </section>
 
       <!-- Corrective Maintenance Intervention Form -->

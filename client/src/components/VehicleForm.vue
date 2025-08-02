@@ -13,7 +13,7 @@
       <div>
         <label>Brunch:</label>
         <select v-model="formData.Brunch" required>
-          <option disabled value="">Veuillez sélectionner</option>
+          <option disabled value=""> select</option>
           <option value="HO">HO</option>
           <option value="NBE">NBE</option>
           <option value="MIR">MIR</option>
@@ -66,8 +66,8 @@
 import apiServices from '../services/apiServices';
 
 export default {
-  name: 'VehicleForm',
-  props: {
+  name: 'VehicleForm', 
+  props: { // des parametres d'entrée que le composant reçoit de son parent
     vehicle: {
       type: Object,
       default: null,
@@ -89,7 +89,7 @@ export default {
         registrationNumber: '',
         allocation: '',
       },
-      errors: {} // Objet pour stocker les messages d'erreur
+      errors: {} 
     };
   },
   created() {

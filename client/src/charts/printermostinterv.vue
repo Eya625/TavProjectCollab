@@ -16,61 +16,62 @@ import {
   Legend
 } from 'chart.js';
 import apiService from '../services/apiServices';
-import { PALETTE } from '../charts/palette';
+import { PALETTE } from './palette'; // Palette de couleurs personnalisée
 
 Chart.register(LineController, LineElement, PointElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 export default {
-  name: 'TotalBilledChart',
-  props: {
-    veh: { type: String, default: '' }
-  },
+  name: 'PrinterInterventionByDeptChart',
   data() {
     return {
       chartInstance: null,
       chartData: {
         labels: [],
-        datasets: [{
-          label: 'Billed Amount (TND)',
-          data: [],
-          borderColor: '',
-          backgroundColor: '',
-          borderWidth: 2,
-          pointRadius: 4,
-          tension: 0.3,
-          fill: true
-        }]
+        datasets: []
       }
     };
   },
   mounted() {
-    this.$watch(
-      () => this.veh,
-      v => this.fetchData(v),
-      { immediate: true }
-    );
+    this.fetchData();
   },
   methods: {
-    async fetchData(v) {
+    async fetchData() {
       try {
-        // On suppose que getBilledByMonth renvoie [{ month: '2025-01', total: 1234 }, ...]
-        const raw = await apiService.getBilledByMonth(v);
-        this.chartData.labels = raw.map(r => r.month);
-        this.chartData.datasets[0].data = raw.map(r => r.total);
+        const raw = await apiService.getintervetions();
+        // Exemple attendu : [{ month: '2025-01', departement: 'IT', count: 5 }, …]
 
-        // palette TAV
-        const col = PALETTE[0];
-        this.chartData.datasets[0].borderColor = col;
-        this.chartData.datasets[0].backgroundColor = col + '33';
-        this.chartData.datasets[0].pointBackgroundColor = col;
+        const allMonths = [...new Set(raw.map(r => r.month))].sort((a, b) => a.localeCompare(b));
+        const departements = [...new Set(raw.map(r => r.departement))];
 
+        const datasets = departements.map((dep, idx) => {
+          const color = PALETTE[idx % PALETTE.length];
+          return {
+            label: dep,
+            data: allMonths.map(month => {
+              const entry = raw.find(r => r.month === month && r.departement === dep);
+              return entry ? entry.count : 0;
+            }),
+            borderColor: color,
+            backgroundColor: color + '33',
+            pointBackgroundColor: color,
+            borderWidth: 2,
+            pointRadius: 4,
+            tension: 0.2,
+            fill: true
+          };
+        });
+
+        this.chartData.labels = allMonths;
+        this.chartData.datasets = datasets;
         this.renderChart();
-      } catch (e) {
-        console.error('TotalBilledChart.fetchData error', e);
+      } catch (err) {
+        console.error('fetchData error', err);
       }
     },
     renderChart() {
-      if (this.chartInstance) this.chartInstance.destroy();
+      if (this.chartInstance) {
+        this.chartInstance.destroy();
+      }
       const ctx = this.$refs.chartCanvas.getContext('2d');
       this.chartInstance = new Chart(ctx, {
         type: 'line',
@@ -90,10 +91,7 @@ export default {
               titleColor: '#fff',
               bodyColor: '#fff',
               callbacks: {
-                label: ctx => {
-                  const val = ctx.parsed.y ?? 0;
-                  return `${ctx.dataset.label}: ${val.toLocaleString()} TND`;
-                }
+                label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString()} interventions`
               }
             }
           },
@@ -107,13 +105,19 @@ export default {
               grid: { color: 'rgba(255,255,255,0.2)' },
               ticks: { color: '#fff', font: { size: 12 } }
             }
+          },
+          elements: {
+            line: { tension: 0.2 },
+            point: { radius: 4 }
           }
         }
       });
     }
   },
   beforeUnmount() {
-    if (this.chartInstance) this.chartInstance.destroy();
+    if (this.chartInstance) {
+      this.chartInstance.destroy();
+    }
   }
 };
 </script>
@@ -122,20 +126,14 @@ export default {
 .chart-card {
   width: 100%;
   height: 350px;
-
-  /* Fond translucide et style existant */
-  background-color: rgba(255,255,255,0.1);
+  background-color: rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   padding: 16px;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-
-  /* ← Marges pour espacer chaque carte */
-  margin: 1rem 0.5rem;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  margin: 2rem 0.8rem 0 -0.1rem;
 }
-
 canvas {
   width: 100% !important;
   height: 100% !important;
-  display: block;
 }
 </style>

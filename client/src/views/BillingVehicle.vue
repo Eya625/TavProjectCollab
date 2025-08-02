@@ -1,5 +1,6 @@
 <template>
   <div class="dashboard-container">
+    <!-- Conteneur principal qui englobe la barre latérale et le contenu principal -->
     <div class="sidebar">
       <NavBar />
     </div>
@@ -11,8 +12,8 @@
           <h1>Billing Section</h1>
           <p>Your financial insights, one click away!</p>
         </div>
-
         <div class="header-right">
+          <!-- Liens vers notifications et déconnexion -->
           <router-link to="/notifications">
             <font-awesome-icon icon="fa-bell" class="icon" />
           </router-link>
@@ -126,15 +127,11 @@
     </div>
   </div>
   <div v-if="pdfDetailUrl" class="modal-overlay" @click.self="pdfDetailUrl = null">
-  <div class="modal-box">
-    <button class="modal-close" @click="pdfDetailUrl = null">×</button>
-    <iframe 
-      :src="pdfDetailUrl" 
-      class="modal-iframe" 
-      frameborder="0"
-    ></iframe>
+    <div class="modal-box">
+      <button class="modal-close" @click="pdfDetailUrl = null">×</button>
+      <iframe :src="pdfDetailUrl" class="modal-iframe" frameborder="0"></iframe>
+    </div>
   </div>
-</div>
 </template>
 <script>
 import apiServices from "../services/apiServices";
@@ -225,12 +222,12 @@ export default {
       this.uploadedPDFs = await apiServices.fetchPdfInvoices();
     },
     async viewPDF(pdf) {
-    try {
-      this.pdfDetailUrl = await apiServices.getPdfUrl(pdf._id);
-    } catch (err) {
-      console.error(err);
-    }
-  },
+      try {
+        this.pdfDetailUrl = await apiServices.getPdfUrl(pdf._id);
+      } catch (err) {
+        console.error(err);
+      }
+    },
     // ferme le modal
     closePdfModal() {
       this.showPdfModal = false;
@@ -250,7 +247,6 @@ export default {
         console.error("Error fetching invoices:", error);
       }
     },
-
     openAddModal() {
       this.showAddModal = true;
       this.editedInvoice = {};
@@ -267,16 +263,15 @@ export default {
     async saveInvoice() {
       try {
         // Récupère l'objet facture depuis le composant enfant via le ref "InvoiceForm"
+        // .localInvoice propriété interne de composant enfant, contenant l'objet facture en cours d'édition
         const invoiceToSave = this.$refs.InvoiceForm.localInvoice;
-
-        // Vérification des champs obligatoires
+        // Vérification des champs obligatoires : tester l'existance de deux champs 
         if (!invoiceToSave.invoiceType || !invoiceToSave.month) {
           throw new Error("Invoice Type and Month are required.");
         }
-
         // Met à jour les totaux dans le composant enfant
+        // méthode du composant enfant 
         this.$refs.InvoiceForm.updateTotals();
-
         // Envoie la facture mise à jour à l'API
         if (this.showAddModal) {
           await apiServices.addInvoice(invoiceToSave);
@@ -286,21 +281,19 @@ export default {
           }
           await apiServices.updateInvoice(invoiceToSave._id, invoiceToSave);
         }
-
         // Actualise la liste des factures
         await this.fetchInvoices();
-
         // Affiche un message de succès et ferme le modal
         this.successMessage = "Invoice saved successfully!";
         this.closeModal();
-
-        // Réinitialise le message après 3 secondes
+        // Réinitialise le message après 4 secondes
         setTimeout(() => {
           this.successMessage = '';
         }, 4000);
-
       } catch (error) {
         console.error("Error saving invoice:", error);
+        //on essaie de récupérer un message précis fourni par l’API (error.response.data.message) 
+        // 
         if (error.response && error.response.data && error.response.data.message) {
           this.successMessage = error.response.data.message;
         } else {
@@ -311,22 +304,35 @@ export default {
         }, 4000);
       }
     },
-
+    
 
     async deleteInvoice(id) {
+        // 1. Trouve la position de la facture à supprimer dans le tableau
       const index = this.invoices.findIndex((item) => item._id === id);
+      // 2. Si la facture existe bien (index ≠ -1)
       if (index !== -1) {
+        // 3. Retire la facture du tableau et la garde de côté pour un éventuel "undo"
         this.lastDeletedItem = this.invoices.splice(index, 1)[0];
+        // 4. Garde en mémoire l’endroit où elle était pour pouvoir la réinsérer
         this.lastDeletedIndex = index;
+        // 5. Affiche le bouton “Annuler” dans l’interface
         this.showUndo = true;
+    // 6. Lance un chrono de 3 secondes avant la suppression définitive côté serveur
 
         this.deleteTimeout = setTimeout(async () => {
           try {
+            // 6a. Appel API pour supprimer vraiment la facture en base
             await apiServices.deleteInvoice(id);
+            // 6b. Recharge la liste des factures depuis le serveur
+
             await this.fetchInvoices();
           } catch (error) {
+            // 6c. En cas d’erreur, on l’affiche dans la console
+
             console.error("Error deleting invoice:", error);
           } finally {
+            // 6d. Cache le bouton “Annuler” (qu’il y ait eu succès ou erreur)
+
             this.showUndo = false;
           }
         }, 3000);
@@ -334,10 +340,15 @@ export default {
     },
 
     undoDelete() {
+     // 1. Vérifie qu’il y a bien un élément supprimé et un indice où le remettre
       if (this.lastDeletedItem !== null && this.lastDeletedIndex !== null) {
+     // 2. Réinsère l’élément supprimé à sa position d’origine dans le tableau
         this.invoices.splice(this.lastDeletedIndex, 0, this.lastDeletedItem);
+      // 3. Annule le timer de suppression différée pour que la suppression réelle ne se déclenche pas
         clearTimeout(this.deleteTimeout);
       }
+      // 4. Cache le bouton “Annuler” puisque l’opération est annulée
+     
       this.showUndo = false;
     },
 
@@ -652,11 +663,14 @@ export default {
     transform: translateX(-50%) translateY(0);
   }
 }
+
 .modal-overlay {
   position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  background: rgba(0,0,0,0.6);
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -671,12 +685,13 @@ export default {
   background: white;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .modal-close {
   position: absolute;
-  top: 8px; right: 12px;
+  top: 8px;
+  right: 12px;
   background: transparent;
   border: none;
   font-size: 1.5rem;
@@ -688,5 +703,4 @@ export default {
   width: 100%;
   height: 100%;
 }
-
 </style>

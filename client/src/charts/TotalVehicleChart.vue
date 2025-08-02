@@ -1,7 +1,7 @@
 <template>
   <div class="chart-card">
     <div class="chart-header">
-      <h3 class="chart-title">Total Véhicules</h3>
+      <h3 class="chart-title">Total vehicles</h3>
     </div>
     <canvas ref="chartCanvas"></canvas>
   </div>
@@ -23,9 +23,9 @@ export default {
     return {
       chartInstance: null,
       chartData: {
-        labels: ['Total véhicules'],
+        labels: ['Total vehicles'],
         datasets: [{
-          label: 'Total véhicules',
+          label: 'Total vehicles',
           data: [0],
           backgroundColor: '',
           borderColor: '',
@@ -74,7 +74,7 @@ export default {
           plugins: {
             title: {
       display: true,
-      text: 'Total des Véhicules',
+      text: 'Total vehicles',
       color: '#fff',
       font: { size: 16, weight: '600' },
       padding: { bottom: 10 }
@@ -112,9 +112,8 @@ export default {
 <style scoped>
 .chart-card {
   /* Retire la hauteur fixe */
-  /* height: 350px; */
   min-height: 300px;               /* hauteur minimale */
-  background-color: rgba(255,255,255,0.1);
+  background-color: rgba(2, 2, 20, 0.763);
   backdrop-filter: blur(8px);
   border-radius: 12px;
   padding: 1rem;                   /* 16px */

@@ -31,7 +31,7 @@ export default {
       chartData: {
         labels: [],
         datasets: [{
-          label: 'Nombre de factures',
+          label: 'Number of invoices',
           data: [],
           borderColor: '',
           backgroundColor: '',

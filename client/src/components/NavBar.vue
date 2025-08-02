@@ -36,9 +36,9 @@
                 </router-link>
               </li>
               <li>
-                <router-link to="/aps" class="nav-item sub-item">
+                <!--<router-link to="/aps" class="nav-item sub-item">
                   <i class="fas fa-gas-pump"></i> <span>APS</span>
-                </router-link>
+                </router-link>-->
               </li>
             </ul>
           </li>

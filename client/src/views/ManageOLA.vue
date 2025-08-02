@@ -30,7 +30,12 @@
       <!-- Global Filter Bar -->
       <div class="filter-bar row-align">
         <label for="yearFilter">Year</label>
-        <input id="yearFilter" type="number" v-model="filterYear" placeholder="Enter a year" />
+        <input
+          id="yearFilter"
+          type="number"
+          v-model="filterYear"
+          placeholder="Enter a year"
+        />
         <button @click="resetFilters" class="reset-filter-btn">
           Initialize Filters
         </button>
@@ -49,7 +54,11 @@
             <div v-if="showAddModal" class="modal">
               <div class="modal-content">
                 <h3>Add Consumption Card</h3>
-                <input v-model="newCardYear" type="number" placeholder="Enter consumption year" />
+                <input
+                  v-model="newCardYear"
+                  type="number"
+                  placeholder="Enter consumption year"
+                />
                 <div class="modal-actions">
                   <button @click="saveCard">Save</button>
                   <button @click="closeModal">Cancel</button>
@@ -60,11 +69,22 @@
 
           <!-- Affichage des cartes OLA existantes (filtrées par année) -->
           <div class="card-container">
-            <div v-for="card in filteredCards" :key="card._id" class="card" @click="selectCard(card)">
-              <button class="deleteicon" :disabled="!canDeletedCard(card)" :title="!canDeletedCard(card)
-                ? 'Deletion not allowed'
-                : 'Click to delete card'
-                " @click.stop="deleteCard(card._id, card)">
+            <div
+              v-for="card in filteredCards"
+              :key="card._id"
+              class="card"
+              @click="selectCard(card)"
+            >
+              <button
+                class="deleteicon"
+                :disabled="!canDeletedCard(card)"
+                :title="
+                  !canDeletedCard(card)
+                    ? 'Deletion not allowed'
+                    : 'Click to delete card'
+                "
+                @click.stop="deleteCard(card._id, card)"
+              >
                 <i class="fas fa-trash"></i>
               </button>
               <h3>{{ card.year }}</h3>
@@ -76,13 +96,17 @@
           <div v-if="selectedCard" class="card-details">
             <!-- Upload PDF-->
             <div class="upload-wrapper">
-  <div class="upload-bar">
-    <input type="file" @change="onFileChange" accept="application/pdf" />
-    <button @click="onUpload" :disabled="!file">Upload relevé</button>
-  </div>
-</div>
-
-
+              <div class="upload-bar">
+                <input
+                  type="file"
+                  @change="onFileChange"
+                  accept="application/pdf"
+                />
+                <button @click="onUpload" :disabled="!file">
+                  Upload relevé
+                </button>
+              </div>
+            </div>
 
             <h2>Details for {{ selectedCard.year }} Card</h2>
 
@@ -90,8 +114,13 @@
             <div class="detail-filter-bar">
               <div class="row-align detail-row">
                 <label for="depCodeFilter">Dep Code</label>
-                <input id="depCodeFilter" type="text" v-model="filterDepCode" placeholder="Department Code"
-                  class="small-input" />
+                <input
+                  id="depCodeFilter"
+                  type="text"
+                  v-model="filterDepCode"
+                  placeholder="Department Code"
+                  class="small-input"
+                />
                 <button @click="resetDetailFilters" class="reset-filter-btn">
                   Initialize Filter Details
                 </button>
@@ -100,15 +129,27 @@
                 <label>Location</label>
                 <div class="filter-checkboxes">
                   <label>
-                    <input type="checkbox" value="HO" v-model="filterLocations" />
+                    <input
+                      type="checkbox"
+                      value="HO"
+                      v-model="filterLocations"
+                    />
                     HO
                   </label>
                   <label>
-                    <input type="checkbox" value="NBE" v-model="filterLocations" />
+                    <input
+                      type="checkbox"
+                      value="NBE"
+                      v-model="filterLocations"
+                    />
                     NBE
                   </label>
                   <label>
-                    <input type="checkbox" value="MIR" v-model="filterLocations" />
+                    <input
+                      type="checkbox"
+                      value="MIR"
+                      v-model="filterLocations"
+                    />
                     MIR
                   </label>
                 </div>
@@ -139,14 +180,20 @@
                   </thead>
 
                   <tbody>
-                    <tr v-for="(detail, index) in paginatedDetails" :key="index">
+                    <tr
+                      v-for="(detail, index) in paginatedDetails"
+                      :key="index"
+                    >
                       <td>{{ detail.id }}</td>
                       <td>{{ detail.employe || detail.cardName }}</td>
                       <td>{{ detail.card_number }}</td>
                       <td>{{ detail.dep_code }}</td>
                       <td>{{ detail.location }}</td>
                       <td>{{ detail.monthly_limit }}</td>
-                      <td v-for="month in dynamicMonths" :key="detail.card_number + '-' + month">
+                      <td
+                        v-for="month in dynamicMonths"
+                        :key="detail.card_number + '-' + month"
+                      >
                         {{ detail.consumptions[month] || 0 }}
                       </td>
 
@@ -158,22 +205,33 @@
                         <!-- Actions selon la carte sélectionnée -->
                         <template v-if="selectedCard">
                           <!-- Pour une carte antérieure -->
-                          <template v-if="parseInt(selectedCard.year) < currentYear">
+                          <template
+                            v-if="parseInt(selectedCard.year) < currentYear"
+                          >
                             <!-- Si la facture est générée, seule la consultation est permise -->
                             <template v-if="selectedCard.isInvoiceGenerated">
-                              <button class="action-btn view_btn" @click="openOlaModal(detail, true)"
-                                title="Invoice generated. Card is read-only. ">
+                              <button
+                                class="action-btn view_btn"
+                                @click="openOlaModal(detail, true)"
+                                title="Invoice generated. Card is read-only. "
+                              >
                                 See Details
                               </button>
                             </template>
                             <!-- Sinon, autoriser Update et Delete -->
                             <template v-else>
-                              <button class="action-btn update_btn" @click="openOlaModal(detail)"
-                                title="Update this entry">
+                              <button
+                                class="action-btn update_btn"
+                                @click="openOlaModal(detail)"
+                                title="Update this entry"
+                              >
                                 Update
                               </button>
-                              <button class="action-btn delete_btn" @click="deleteDetail(detail)"
-                                title="Delete this entry">
+                              <button
+                                class="action-btn delete_btn"
+                                @click="deleteDetail(detail)"
+                                title="Delete this entry"
+                              >
                                 Delete
                               </button>
                             </template>
@@ -181,14 +239,22 @@
 
                           <!-- Pour une carte de l'année en cours -->
                           <template v-else>
-                            <button class="action-btn update_btn" @click="openOlaModal(detail)" :title="selectedCard.isInvoiceGenerated
-                              ? 'invoice generated. Crd remai,s editable for the current year. '
-                              : 'Update this entry'
-                              ">
+                            <button
+                              class="action-btn update_btn"
+                              @click="openOlaModal(detail)"
+                              :title="
+                                selectedCard.isInvoiceGenerated
+                                  ? 'invoice generated. Crd remai,s editable for the current year. '
+                                  : 'Update this entry'
+                              "
+                            >
                               Update
                             </button>
-                            <button class="action-btn delete_btn" @click="deleteDetail(detail)"
-                              title="Delete this entry">
+                            <button
+                              class="action-btn delete_btn"
+                              @click="deleteDetail(detail)"
+                              title="Delete this entry"
+                            >
                               Delete
                             </button>
                           </template>
@@ -199,7 +265,11 @@
                   <tfoot>
                     <tr class="summary-row">
                       <td colspan="6" class="summary-label">Totals</td>
-                      <td v-for="month in dynamicMonths" :key="month" class="summary-value">
+                      <td
+                        v-for="month in dynamicMonths"
+                        :key="month"
+                        class="summary-value"
+                      >
                         {{ monthTotals[month] }}
                       </td>
                       <td class="summary-value"></td>
@@ -208,7 +278,10 @@
                       <td class="summary-value">{{ totalAfterDiscountSum }}</td>
                       <td>
                         <!-- Bouton générer facture -->
-                        <button class="action-btn generate_invoice" @click="openInvoiceForm()">
+                        <button
+                          class="action-btn generate_invoice"
+                          @click="openInvoiceForm()"
+                        >
                           Generate Invoice
                         </button>
                       </td>
@@ -222,7 +295,10 @@
                     Précédent
                   </button>
                   <span>Page {{ currentPage + 1 }} sur {{ totalPages }}</span>
-                  <button @click="nextPage" :disabled="currentPage >= totalPages - 1">
+                  <button
+                    @click="nextPage"
+                    :disabled="currentPage >= totalPages - 1"
+                  >
                     Suivant
                   </button>
                 </div>
@@ -231,17 +307,33 @@
           </div>
 
           <!-- Notification -->
-          <div v-if="notification.show" :class="['notification', notification.type]">
+          <div
+            v-if="notification.show"
+            :class="['notification', notification.type]"
+          >
             {{ notification.message }}
           </div>
 
           <!-- Modal de mise à jour des consommations pour un détail -->
-          <OlaModal v-if="showOlaModal" :visible="showOlaModal" :data="selectedOla" :readonly="isModalReadonly"
-            :year="selectedOlaYear" :isInvoiced="selectedCard.isInvoiceGenerated" @save="handleSaveOla"
-            @close="() => (showOlaModal = false)" />
+          <OlaModal
+            v-if="showOlaModal"
+            :visible="showOlaModal"
+            :data="selectedOla"
+            :readonly="isModalReadonly"
+            :year="selectedOlaYear"
+            :isInvoiced="selectedCard.isInvoiceGenerated"
+            @save="handleSaveOla"
+            @close="() => (showOlaModal = false)"
+          />
           <!-- Modal Invoice Form -->
-          <InvoiceForm v-if="showInvoiceModal" :showModal="showInvoiceModal" :isEditMode="true"
-            :invoice="selectedInvoice" @save="handleInvoiceSave" @close="() => (showInvoiceModal = false)" />
+          <InvoiceForm
+            v-if="showInvoiceModal"
+            :showModal="showInvoiceModal"
+            :isEditMode="true"
+            :invoice="selectedInvoice"
+            @save="handleInvoiceSave"
+            @close="() => (showInvoiceModal = false)"
+          />
         </div>
       </div>
     </div>
@@ -254,7 +346,7 @@ import apiServices from '../services/apiServices';
 import NavBar from '../components/NavBar.vue';
 import OlaModal from '../components/OlaModal';
 import InvoiceForm from '../components/InvoiceForm.vue';
-import Swal from 'sweetalert2'
+import Swal from 'sweetalert2';
 
 import {
   groupDetailsByRegion,
@@ -264,8 +356,10 @@ import {
 export default {
   name: 'ManageOLA',
   components: { NavBar, OlaModal, InvoiceForm },
+  //création de setup pour intégrer les données réactives / fcts
   setup() {
-    // Variables de base
+    // Variables de base : création des données réactive
+    // utile pour suivre automatiquement les changements
     const consumptionCards = ref([]);
     const showAddModal = ref(false);
     const newCardYear = ref('');
@@ -292,38 +386,39 @@ export default {
         notification.value.show = false;
       }, 3000);
     };
-// 1) computed des mois dynamiques
-const dynamicMonths = computed(() => {
-  const details = selectedCard.value?.details || [];
-  const seen = new Set();
+    // 1) computed des mois dynamiques
+    // génération dynamique des la liste des mois à afficher
+    // si consommation mois = 0 on ne l'affiche pas
+    const dynamicMonths = computed(() => {
+      const details = selectedCard.value?.details || [];
+      const seen = new Set();
 
-  // on ne garde que les mois où au moins une conso > 0
-  details.forEach(d =>
-    Object.entries(d.consumptions).forEach(([month, val]) => {
-      if (val > 0) seen.add(month);
-    })
-  );
+      // on ne garde que les mois où au moins une conso > 0
+      details.forEach((d) =>
+        Object.entries(d.consumptions).forEach(([month, val]) => {
+          if (val > 0) seen.add(month);
+        })
+      );
+      // on renvoie dans l’ordre défini par monthNames
+      return monthNames.filter((m) => seen.has(m));
+    });
 
-  // on renvoie dans l’ordre défini par monthNames
-  return monthNames.filter(m => seen.has(m));
-});
+    // 2) computed des totaux par mois (arrondi à 3 décimales)
+    const monthTotals = computed(() => {
+      const details = selectedCard.value?.details || [];
+      const totals = {};
 
-// 2) computed des totaux par mois (arrondi à 3 décimales)
-const monthTotals = computed(() => {
-  const details = selectedCard.value?.details || [];
-  const totals = {};
+      dynamicMonths.value.forEach((month) => {
+        const rawSum = details.reduce(
+          (sum, d) => sum + (d.consumptions[month] || 0),
+          0
+        );
+        // arrondir à 3 décimales : multiplie, arrondit, puis redivise
+        totals[month] = Math.round(rawSum * 1000) / 1000;
+      });
 
-  dynamicMonths.value.forEach(month => {
-    const rawSum = details.reduce(
-      (sum, d) => sum + (d.consumptions[month] || 0),
-      0
-    );
-    // arrondir à 3 décimales : multiplie, arrondit, puis redivise
-    totals[month] = Math.round(rawSum * 1000) / 1000;
-  });
-
-  return totals;
-});
+      return totals;
+    });
     /*________
     // Gestion des notifications
     const showNotification = (message, type = 'success') => {
@@ -334,18 +429,24 @@ const monthTotals = computed(() => {
     };_ Partie Filtrage des cartes + data card_________   */
     // Computed pour filtrer les détails de la carte sélectionnée
     const filteredDetails = computed(() => {
-      if (!selectedCard.value || !selectedCard.value.details) return [];
+      if (!selectedCard.value?.details) return [];
       let details = selectedCard.value.details;
+
+      // Filtre par emplacement
       if (filterLocations.value.length) {
         details = details.filter((d) =>
           filterLocations.value.includes(d.location)
         );
       }
+
+      // Filtre par dep_code, en protégeant d.dep_code
       if (filterDepCode.value) {
+        const search = filterDepCode.value.toLowerCase();
         details = details.filter((d) =>
-          d.dep_code.toLowerCase().includes(filterDepCode.value.toLowerCase())
+          (d.dep_code || '').toLowerCase().includes(search)
         );
       }
+
       return details;
     });
 
@@ -375,7 +476,7 @@ const monthTotals = computed(() => {
       if (!preservePage.value) {
         currentPage.value = 0;
       }
-      preservePage.value = false; 
+      preservePage.value = false;
     });
 
     const resetFilters = () => {
@@ -387,6 +488,7 @@ const monthTotals = computed(() => {
       filterDepCode.value = '';
     };
     // Computed pour filtrer les cartes par année
+    // filtres initial par année
     const filteredCards = computed(() => {
       if (!filterYear.value) return consumptionCards.value;
       return consumptionCards.value.filter(
@@ -397,7 +499,7 @@ const monthTotals = computed(() => {
     /*_________ FinPartie Filtrage des cartes + data card_________   */
 
     /*  _________Partie pour les cartes OLA______________  */
-    // Récupération des cartes
+    //conversion entre numéro et clé nominale -> upload relevé
     const monthNames = [
       'January',
       'February',
@@ -413,56 +515,89 @@ const monthTotals = computed(() => {
       'December'
     ];
 
+    // gestion de la sélection de fichier dans l'input + récupération et stockage dans la ref file
     function onFileChange(evt) {
       file.value = evt.target.files[0];
     }
     async function onUpload() {
+      // 0) S’assurer qu’un fichier et une carte sont sélectionnés
       if (!file.value || !selectedCard.value) return;
 
+      // 1) Préparation du FormData pour l’upload
       const form = new FormData();
       form.append('file', file.value);
 
       try {
-        // 1. appel au back pour extraire period + tableData
-        const data = await apiServices.uploadDetailsReleves(form);
-        const { period, tableData } = data;
+        // 2) Extraction period + tableData depuis le PDF
+        const { period, tableData } =
+          await apiServices.uploadDetailsReleves(form);
+        //    period = "YYYY-MM"
 
-        // 2. calcul du monthKey
-        const [, mm] = period.split('-');
-        const monthKey = monthNames[parseInt(mm, 10) - 1];
+        // 3) Vérifier que l’année extraite correspond à celle de la carte
+        const [yearStr, monthStr] = period.split('-');
+        const extractedYear = parseInt(yearStr, 10);
+        const cardYear = Number(selectedCard.value.year);
+        if (extractedYear !== cardYear) {
+          // Notification et arrêt si années différentes
+          showNotification(
+            `Year of details (${extractedYear}) doesn't match year of card (${cardYear}).`,
+            'error'
+          );
+          return;
+        }
 
-        // 3. normalisation et écriture des consommations dans selectedCard.value.details
+        // 4) Détermination de la clé de mois (ex. "March")
+        const monthKey = monthNames[parseInt(monthStr, 10) - 1];
+
+        // 5) Mise à jour locale de selectedCard.value.details
         tableData.forEach(({ cardNumber, total }) => {
           const cleanPdfNum = cardNumber.replace(/^0+/, '');
-          const detail = selectedCard.value.details.find(d =>
-            d.card_number.replace(/^0+/, '') === cleanPdfNum
+          const detail = selectedCard.value.details.find(
+            (d) => d.card_number.replace(/^0+/, '') === cleanPdfNum
           );
           if (detail) {
             detail.consumptions[monthKey] = total;
           }
         });
 
-        // 4. enregistrement en base (on envoie TOUJOURS tableData original)
-        await apiServices.saveReleveData({
+        // 6) Envoi vers le backend pour persistance
+        const response = await apiServices.saveReleveData({
           period,
           cardId: selectedCard.value.id,
           data: tableData
         });
 
-        // Optionnel : recalcul total général…
+        // 7) Notification de succès ou cas inattendu
+        if (response.success && response.message) {
+          showNotification(response.message, 'success');
+        } else {
+          showNotification(
+            'Upload completed, but unexpected response.',
+            'warning'
+          );
+        }
       } catch (err) {
-        console.error("Erreur lors de l'upload :", err);
+        // 8.a) Doublon détecté (409 Conflict)
+        if (err.response?.status === 409 && err.response.data?.message) {
+          showNotification(err.response.data.message, 'warning');
+        }
+        // 8.b) Toutes autres erreurs
+        else {
+          console.error('Error while saving relevés:', err);
+          showNotification('Error uploading details.', 'error');
+        }
       }
-    };
-
+    }
 
     // ==== fin upload ====
+    // récupération des cartes OLA depuis la base
     const fetchCards = async () => {
       try {
+        // appel à l'API et mise à jour de la ref 'consumptioncards'
         consumptionCards.value = await apiServices.getCards();
       } catch (error) {
-        console.error('Error fetching cards:', error);
-        showNotification('Erreur lors de la récupération des cartes', 'error');
+        //console.error('Error fetching cards:', error);
+        showNotification('Error while fetching cards', 'error');
       }
     };
 
@@ -472,10 +607,9 @@ const monthTotals = computed(() => {
       const currentYear = new Date().getFullYear();
 
       if (!enteredYear) {
-        showNotification("L'année est obligatoire", 'error');
+        showNotification('The Year field is Required', 'error');
         return;
       }
-
       if (enteredYear > currentYear) {
         showNotification(
           'You cannot add a year greater than the current year',
@@ -506,6 +640,7 @@ const monthTotals = computed(() => {
 
     const selectCard = async (card) => {
       try {
+        // Appel API pour récupérer les détails complets de la carte
         const cardDetails = await apiServices.getCardDetails(card._id);
         // Si on clique à nouveau sur la même carte, la désélectionner
         selectedCard.value =
@@ -519,54 +654,56 @@ const monthTotals = computed(() => {
       }
     };
 
-    // Ouverture du modal OLA (pour update ou consultation)
+    // setectedcard.value && selectedcard.value.invoicegenerated
+    // on vérifie ici que selectedCard existe et que sa facture est générée
+
+    // fonction d'ouverture du modal OLA (pour update ou consultation)
     const openOlaModal = (ola = null, readonly = false) => {
-      // Si la carte a une facture générée, la consultation est en lecture seule
+      /* on va déterminer le mode de lecture seule(ReadOnlyFinal)  */
       const readOnlyFinal =
         selectedCard.value && selectedCard.value.invoiceGenerated
           ? // si facture générée ET année antérieure → lecture seule
-          parseInt(selectedCard.value.year) < currentYear
-          : // sinon (pas de facture ou même année courante) → on respecte le drapeau readonly passé
-          readonly;
+            parseInt(selectedCard.value.year) < currentYear
+          : // sinon (pas de facture ou même année courante) → on respecte le readonly passé cad readonly = false
+            readonly;
 
       // S'il n'y a pas d'objet ola, on prépare une nouvelle entrée
       selectedOla.value = ola
         ? { ...ola }
         : {
-          id: '',
-          employe: '',
-          card_number: '',
-          dep_code: '',
-          location: '',
-          monthly_limit: 0,
-          consumptions: {
-            January: 0,
-            February: 0,
-            March: 0,
-            April: 0,
-            May: 0,
-            June: 0,
-            July: 0,
-            August: 0,
-            September: 0,
-            October: 0,
-            November: 0,
-            December: 0
-          },
-          totalConsumption: 0,
-          finalized: false
-        };
-
+            id: '',
+            employe: '',
+            card_number: '',
+            dep_code: '',
+            location: '',
+            monthly_limit: 0,
+            consumptions: {
+              January: 0,
+              February: 0,
+              March: 0,
+              April: 0,
+              May: 0,
+              June: 0,
+              July: 0,
+              August: 0,
+              September: 0,
+              October: 0,
+              November: 0,
+              December: 0
+            },
+            totalConsumption: 0,
+            finalized: false
+          };
       // Passage de l'année de la carte au modal.
       // Si la carte sélectionnée existe, on prend son année, sinon on prend l'année courante.
       selectedOlaYear.value = selectedCard.value?.year || currentYear;
-
       isModalReadonly.value = readOnlyFinal;
       showOlaModal.value = true;
     };
 
-    // Sauvegarde des données de consommation depuis le modal
+    // fonction de  Sauvegarde des données de consommation depuis le modal
     const handleSaveOla = async (updatedDetail) => {
+      // on marque la page pour qu'elle ne soit pas rechargé
       preservePage.value = true;
       // Vérification que toutes les valeurs de consommation soient non négatives
       const hasNegativeConsumption = Object.values(
@@ -579,24 +716,29 @@ const monthTotals = computed(() => {
       // Interdire la modification si la carte est facturée
       if (selectedCard.value.invoiceGenerated) {
         showNotification(
-          'Cette carte est déjà facturée. Vous ne pouvez plus la modifier.',
+          'Card already Invoiced. You cannot modify.',
           'warning'
         );
         return;
       }
       // Mise à jour locale du détail dans la carte sélectionnée
+      // on cherche l'index du détail(par ID) dans selectedCrd.value.details
       const index = selectedCard.value.details.findIndex(
         (d) => d.id === updatedDetail.id
       );
       if (index !== -1) {
+        // si le détail existait déjà, on le remplace à la même position
         selectedCard.value.details.splice(index, 1, updatedDetail);
       } else {
+        // sinon on l'ajoute à la fin de tableau(comme nv détail)
         selectedCard.value.details.push(updatedDetail);
       }
 
       // Recalcul des consommations
+      // a) par détail : appel à notre fonction utilitaire
       updatedDetail.totalConsumptionYear =
         calculateYearlyConsumption(updatedDetail);
+      // b) global : somme de tous les mois de tous les détails
       let total = selectedCard.value.details.reduce((sum, detail) => {
         const consumptions = Object.values(detail.consumptions);
         return sum + consumptions.reduce((acc, curr) => acc + Number(curr), 0);
@@ -614,12 +756,14 @@ const monthTotals = computed(() => {
         location: updatedDetail.location,
         monthly_limit: updatedDetail.monthly_limit
       };
-
+      /* Envoie de la requête de mise à jour au serveur */
       try {
+        // appel asynchrone à votre serveur API
         const updatedCard = await apiServices.updateCard(
           selectedCard.value._id,
           payload
         );
+        // si succès, on met à jour selectedCard avec la réponse réçu de serveur
         selectedCard.value = { ...updatedCard };
         const cardIndex = consumptionCards.value.findIndex(
           (card) => card._id === updatedCard._id
@@ -627,43 +771,51 @@ const monthTotals = computed(() => {
         if (cardIndex !== -1) {
           consumptionCards.value.splice(cardIndex, 1, updatedCard);
         }
-        showNotification('Carte mise à jour avec succès');
+        showNotification('Successfully Updating Card');
       } catch (error) {
+        // en cas d'erreur, on notifie
         console.error('Error updating card:', error);
-        showNotification('Erreur lors de la mise à jour', 'error');
+        showNotification('Error Updating Card', 'error');
       } finally {
+        // fermeture de modal
         showOlaModal.value = false;
       }
     };
 
-    // Suppression d'un détail de la carte
+    // fonction pour  Supprimer un détail de la carte de consommation
     const deleteDetail = async (detail) => {
       if (!selectedCard.value) return;
       // Empêcher la suppression si la carte est facturée
       if (selectedCard.value.invoiceGenerated) {
         showNotification(
-          'Cette carte est déjà facturée. Vous ne pouvez plus la modifier.',
-          'warning'
+          'This card has already been invoiced. You can no longer modify it.',
+          'error'
         );
         return;
       }
       try {
+        // appel API afin de supprimer le détail de consomm
+        // on passe l'ID de la carte
+        // on passe l'ID du détail || num carte
         const updatedCard = await apiServices.deleteDetailFromCard(
           selectedCard.value._id,
           detail.id || '',
           detail.id ? null : detail.card_number
         );
+        // synchronisation du détail supprimé
+        // on met à jour le selectedCard avec la réponse du serveur
         selectedCard.value = { ...updatedCard };
+        // MAJ la liste globale des cartes
         const cardIndex = consumptionCards.value.findIndex(
           (card) => card._id === updatedCard._id
         );
         if (cardIndex !== -1) {
           consumptionCards.value.splice(cardIndex, 1, updatedCard);
         }
-        showNotification('Détail supprimé avec succès');
+        showNotification('Successfully Deleted Detail consumption ');
       } catch (error) {
-        console.error('Erreur lors de la suppression du détail :', error);
-        showNotification('Erreur lors de la suppression du détail', 'error');
+        console.error('Error deleting detail :', error);
+        showNotification('Error deleting detail consumption', 'error');
       }
     };
 
@@ -671,36 +823,40 @@ const monthTotals = computed(() => {
       return !card.totalConsumption || card.totalConsumption <= 0;
     };
 
-   const deleteCard = async (cardId, card) => {
-  // 1. Vérifier que l’icône est activée
-  if (!canDeletedCard(card)) {
-    showNotification('Deletion not allowed', 'error')
-    return
-  }
+    // fonction de suppression d'une carte de consommation
+    const deleteCard = async (cardId, card) => {
+      // 1. Vérifier que l’icône est activée
+      if (!canDeletedCard(card)) {
+        showNotification('Deletion not allowed', 'error');
+        return; // stop si l'icône est désactivée
+      }
+      // 2. Ouvrir le modal de confirmation au user(sweetalert)
+      const result = await Swal.fire({
+        title: 'Are You sure ?',
+        text: `Do you really want to delete the card for year ${card.year}?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it',
+        cancelButtonText: 'Non, Keep it'
+      });
 
-  // 2. Ouvrir le modal de confirmation
-  const result = await Swal.fire({
-    title: 'Are You sure ?',
-    text: `Do you really want to delete the card for year ${card.year}?`,
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Yes, delete it',
-    cancelButtonText: 'Non, Keep it'
-  })
-
-  // 3. Si l’utilisateur confirme, on supprime
-  if (result.isConfirmed) {
-    try {
-      await apiServices.deleteCard(cardId)
-      consumptionCards.value = consumptionCards.value.filter(c => c._id !== cardId)
-      showNotification('Card deleted successfully', 'success')
-    } catch (error) {
-      console.error(error)
-      showNotification('Error deleting card', 'error')
-    }
-  }
-  // 4. Si l’utilisateur annule, on ne fait rien (le modal se ferme tout seul)
-}
+      // 3. Si l’utilisateur confirme, on supprime
+      if (result.isConfirmed) {
+        try {
+          // appel API pour la suppression de la carte côté serveur
+          await apiServices.deleteCard(cardId);
+          // mise à jour locale : on retire la carte du tableau
+          consumptionCards.value = consumptionCards.value.filter(
+            (c) => c._id !== cardId
+          );
+          showNotification('Card deleted successfully', 'success');
+        } catch (error) {
+          console.error(error);
+          showNotification('Error deleting card', 'error');
+        }
+      }
+      // 4. Si l’utilisateur annule, on ne fait rien (le modal se ferme tout seul)
+    };
     /*  _________Fin Partie pour les cartes OLA______________  */
 
     // --- Partie Facturation ---
@@ -711,9 +867,6 @@ const monthTotals = computed(() => {
 
     // Fonction pour ouvrir le formulaire de facture
     const openInvoiceForm = () => {
-      // Transformation des détails filtrés pour s'assurer que chaque objet
-      // possède un champ "region" (ici issu de "location") et "expenseAmount"
-      // que l'on définit par exemple à partir du total après discount.
       const transformedDetails = filteredDetails.value.map((detail) => ({
         ...detail,
         // Utiliser detail.location comme région (à adapter si besoin)
@@ -721,12 +874,10 @@ const monthTotals = computed(() => {
         // Définir expenseAmount à partir de votre calcul existant
         expenseAmount: parseFloat(calculateTotalAfterDiscount(detail)) || 0
       }));
-
       // Utiliser le module utilitaire pour regrouper par région et calculer les totaux
       const regions = groupDetailsByRegion(transformedDetails);
       const grandTotal = calculateGrandTotal(regions);
       const stampTax = 1;
-
       const year =
         selectedCard.value && selectedCard.value.year
           ? selectedCard.value.year
@@ -744,42 +895,43 @@ const monthTotals = computed(() => {
       showInvoiceModal.value = true;
     };
 
+    // fonction appelée quand on valide la création/enregistrement de la facture
     const handleInvoiceSave = async (invoiceData) => {
+      // validation : montant de facture ne doit pas être égale à 0
       const total = Number(invoiceData.grandTotal);
       if (total === 0) {
         showNotification(
           'The invoice amount cannot be zero. You must fill in the consumption amounts.',
           'error'
         );
-        return;
+        return; // annulation de l'enregistrement si le montant est nul
       }
-
       try {
+        // marqué facture à été générée
         invoiceData.isInvoiceGenerated = true;
+        // envoie dans le serveur
         await apiServices.addInvoice(invoiceData);
 
-        console.log('Carte récupérée :', selectedCard.value);
+        //console.log('cards retreived  :', selectedCard.value);
 
         if (selectedCard.value) {
           const cardId = selectedCard.value._id || selectedCard.value.id;
           if (!cardId) {
             console.error(
-              'Aucun identifiant trouvé pour la carte sélectionnée:',
+              'No identifier found for the selected card:',
               selectedCard.value
             );
           } else {
+            //appel API pour marqué la carte comme facturée
             await apiServices.updateCard(cardId, { isInvoiceGenerated: true });
-
-            //  Mise à jour locale de la carte pour forcer le changement immédiat du bouton
+            // mise à jour local de nv statut
             selectedCard.value.isInvoiceGenerated = true;
 
             // Forcer le mode readonly du modal si la carte est toujours affichée
             isModalReadonly.value = true;
           }
         }
-
         showNotification('Invoice created successfully!', 'success');
-
         //  Rafraîchit la liste (utile si elle est affichée ailleurs)
         await fetchCards();
 
@@ -905,8 +1057,7 @@ const monthTotals = computed(() => {
       onUpload,
       // ajout des mois dynamiquement
       dynamicMonths,
-      monthTotals 
-      
+      monthTotals
     };
   }
 };
@@ -1016,7 +1167,6 @@ const monthTotals = computed(() => {
   flex: 1;
   display: flex;
   animation: fadeIn 1s ease;
-
 }
 
 /* Zone de contenu */
@@ -1620,12 +1770,11 @@ const monthTotals = computed(() => {
   margin-top: 2rem;
 }
 
-
 .upload-bar:hover {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
 }
 
-.upload-bar input[type="file"] {
+.upload-bar input[type='file'] {
   flex: 1;
   padding: 0.5rem;
   border: 2px dashed #bbb;
@@ -1635,13 +1784,13 @@ const monthTotals = computed(() => {
   transition: border-color 0.3s ease;
 }
 
-.upload-bar input[type="file"]:hover {
+.upload-bar input[type='file']:hover {
   border-color: #777;
 }
 
 .upload-bar button {
   padding: 0.5rem 1rem;
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   border: none;
   border-radius: 0.75rem;
@@ -1668,5 +1817,4 @@ canvas {
   width: 100% !important;
   height: 300px !important;
 }
-
 </style>

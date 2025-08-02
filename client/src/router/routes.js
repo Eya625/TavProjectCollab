@@ -18,7 +18,7 @@ import VehicleNavbar from '../components/VehicleNavbar.vue';
 import Facturation from '../views/Facturation.vue';
 import DashboardChart from '../views/dashboardChart.vue';
 import FinanceDashboard from '../views/FinanceDashboard.vue';
-
+import printermostinterv from '../charts/printermostinterv.vue';
 
 const routes = [
   { path: '/profile/:email', component: ConsulterProfil },
@@ -46,6 +46,7 @@ const routes = [
   { path: '/facturation',component: Facturation},
   { path: '/dashchart',component: DashboardChart},
   { path: '/dashboard/finance', component: FinanceDashboard },
+  {path : '/printermostinterv',component: printermostinterv}
 ];
 
 const router = createRouter({

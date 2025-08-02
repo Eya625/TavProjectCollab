@@ -28,9 +28,9 @@ export default {
     return {
       chartInstance: null,
       chartData: {
-        labels: ['Moy. actuelle', 'Moy. il y a 1 an'],
+        labels: ['Ag.Current ', 'Avg. 1 Year Ago'],
         datasets: [{
-          label: 'Moyenne facture',
+          label: 'Average Invoice',
           data: [0, 0],
           backgroundColor: [],
           borderColor: [],
@@ -78,7 +78,7 @@ export default {
           plugins: {
             title: {
               display: true,
-              text: 'Moyenne des Factures',
+              text: 'Average invoice',
               color: '#fff',
               font: { size: 16, weight: '600' },
               padding: { bottom: 10 }

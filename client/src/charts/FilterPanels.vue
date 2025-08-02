@@ -1,15 +1,15 @@
 <template>
   <aside class="filter-panel">
     <div class="group">
-      <label for="year-select">Année</label>
+      <label for="year-select">Year</label>
       <select id="year-select" v-model="localYear">
         <option v-for="y in years" :key="y" :value="y">{{ y }}</option>
       </select>
     </div>
     <div class="group">
-      <label for="employee-select">Employé</label>
+      <label for="employee-select">Employees</label>
       <select id="employee-select" v-model="localEmployee">
-        <option value="">Tous</option>
+        <option value="">ALL</option>
         <option v-for="e in employees" :key="e" :value="e">{{ e }}</option>
       </select>
     </div>
@@ -23,7 +23,7 @@
       </ul>
     </div>
     <div class="group">
-      <label>Mois</label>
+      <label>Months</label>
       <ul class="checkbox-list months">
         <li v-for="m in months" :key="m">
           <input type="checkbox" :id="`month-${m}`" :value="m" v-model="localMonths" />

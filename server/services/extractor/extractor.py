@@ -1,9 +1,9 @@
 import re  # extraire du texte
-import json #
+import json # envoie des messages au client au format json(simple)
 import unicodedata # normalisation des caractères Unicode
-import pytesseract # interface python vers tesseract / OCR (reconnaissance du texte)
+import pytesseract # bib python vers tesseract / OCR (reconnaissance du texte)
 import yaml # lecrure de fichier YAML(charger une template)
-from pathlib import Path #manipulation
+from pathlib import Path #manipulation 
 from pdf2image import convert_from_path # conversion de chaque page PDF en image PIL
 from PIL import Image, ImageFilter, ImageOps # traitement d'images(filtres/contraste)
 from jinja2 import Template # mettre en forme un rendu text
@@ -150,12 +150,12 @@ def extract_total_ttc_corrige(raw: str) -> float:
     # 1) Normalisation du texte: remplace espaces insécables et retours ligne
     text = raw.replace('\xa0', ' ').replace('\n', ' ')
 
-    # 2) Premier essai d'extraction via la version historique (v1)
+    # 2) Premier essai d'extraction via la version (v1)
     t1 = extract_total_ttc_v1(text)
     if t1 > 0:
         return t1
     
-    # 3) Deuxième essai via la version robuste (v2)
+    # 3) Deuxième essai via la version  (v2)
     t2 = extract_total_ttc_v2(text)
     if t2 > 0:
         return t2
@@ -208,14 +208,17 @@ def extract_equip(t: str):
             typ = " ".join(sel)
     return imma, typ
 
-# --- Helpers OCR ---
+# --- Pipelibe OCR ---
+# — conversion PDF → images PIL
 def pdf_to_images(path, dpi=300):
     """
+    PIL python programming library
+    DPI points par pouce
     Convertit chaque page PDF en image PIL à la résolution DPI spécifiée.
     Nécessite poppler (POPPLER_PATH configuré).
     """
     return convert_from_path(path, dpi=dpi, poppler_path=POPPLER_PATH)
-
+# — prétraitement d’une image (gris, contraste, unsharp)
 def preprocess(img: Image.Image) -> Image.Image:
     """
     Pré-traite l'image pour améliorer la reconnaissance OCR :
@@ -225,7 +228,7 @@ def preprocess(img: Image.Image) -> Image.Image:
     """
     g = ImageOps.grayscale(img)
     return ImageOps.autocontrast(g).filter(ImageFilter.UnsharpMask(radius=2, percent=150, threshold=3))
-
+# — extraction du texte brut d’un PDF
 def ocr_text(path: str) -> str:
     """
     Extrait le texte brut d'un PDF en :
@@ -242,6 +245,8 @@ def ocr_text(path: str) -> str:
         out.append(clean)
     return "\n".join(out)
 
+
+# — nettoyage simple du texte OCR
 def clean_txt(t: str) -> str:
     """
     Nettoie le texte OCR pour les extractions basiques :
@@ -264,6 +269,8 @@ def extract_date(t: str) -> str:
     m = re.search(r"\b(\d{1,2}[\/\-.]\d{1,2}[\/\-.]\d{4})\b", t)
     return m.group(1) if m else "N/A"
 
+
+# fonction de base
 def parse_invoice(path: str) -> dict:
     """
     Chaîne d'extraction complète :
@@ -305,6 +312,5 @@ if __name__ == "__main__":
         sys.exit(1)
 
     data = parse_invoice(sys.argv[1])
-    # n’écrire QUE le JSON sur stdout
     import sys
     sys.stdout.write(json.dumps(data, ensure_ascii=False))

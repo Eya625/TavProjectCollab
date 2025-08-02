@@ -30,7 +30,7 @@ export default {
       chartData: {
         labels: [],
         datasets: [{
-          label: 'Coût par agence',
+          label: 'Cost per Location',
           data: [],
           backgroundColor: [],
           borderColor: [],
@@ -78,7 +78,7 @@ export default {
             // 1. titre global
             title: {
               display: true,
-              text: 'Coût par Agence',
+              text: 'Cost per Location',
               color: '#fff',
               font: { size: 16, weight: '600' },
               padding: { bottom: 10 }
@@ -113,7 +113,7 @@ export default {
               // 4. titre axe X
               title: {
                 display: true,
-                text: 'Coût (TND)',
+                text: 'Costs (TND)',
                 color: '#fff',
                 font: { size: 12 }
               }
@@ -124,7 +124,7 @@ export default {
               // 5. titre axe Y
               title: {
                 display: true,
-                text: 'Agence',
+                text: 'Location',
                 color: '#fff',
                 font: { size: 12 }
               }

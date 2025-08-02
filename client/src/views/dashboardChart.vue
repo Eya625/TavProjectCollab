@@ -50,7 +50,7 @@
             :colors="monthColors"
           />
 
-          <!-- Top employés (bar) -->
+          <!-- Top 10 employés (bar) -->
           <TopEmployeesChart
             class="chart-grid"
             :year="year"
@@ -68,7 +68,7 @@
           />
         </div>
 
-        <!-- Panneau de filtres sticky -->
+        <!-- Panneau de filtres -->
         <FilterPanels
           class="filter-sticky"
           :years="years"
@@ -108,6 +108,7 @@ export default {
     TotalConsumptionCard
   },
   setup() {
+    // Listes de filtrage
     const years            = ref([]);
     const employeeList     = ref([]);
     const locationList     = ref([]);
@@ -116,19 +117,28 @@ export default {
       'July','August','September','October','November','December'
     ]);
 
+
+    // crée pour la selection de user
+    // ref -> assure la réactivité en vue 3
     const year              = ref(new Date().getFullYear());
     const selectedEmployee  = ref('');
     const selectedLocations = ref([]);
     const selectedMonths    = ref([]);
-
+ 
     const locationColors = ['rgba(255,140,0,0.8)','rgba(65,105,225,0.8)','rgba(0,191,255,0.8)'];
     const monthColors    = ['rgba(27,38,59,0.8)'];
     const topEmpColors   = ['rgba(255,140,0,0.8)','rgba(65,105,225,0.8)','rgba(0,191,255,0.8)'];
 
     onMounted(async () => {
+  // 1) Au moment où le composant est monté, on charge depuis l’API :
+  //    - toutes les années disponibles (years.value)
+  //    - la liste des employés (employeeList.value)
+  //    - la liste des locations (locationList.value)
       years.value        = await api.getAllYears();
       employeeList.value = await api.getAllEmployees();
       locationList.value = await api.getAllLocations();
+   // 2) On vérifie que l’année par défaut (cette année) figure bien dans la liste renvoyée.
+   // Si ce n’est pas le cas, on prend la dernière année disponible.     
       if (!years.value.includes(year.value)) {
         year.value = years.value.at(-1) || year.value;
       }

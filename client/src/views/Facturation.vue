@@ -2,18 +2,16 @@
   <VehicleNavbar />
 
   <div class="facturation-container">
-    <h1 class="page-title">Gestion des factures</h1>
+    <h1 class="page-title">Manage Invoices</h1>
 
     <!-- 1) Upload & extraction -->
     <section class="upload-section">
       <div class="section-header">
-        <h2>Importer une facture PDF</h2>
+        <h2>Import a PDF Invoice</h2>
       </div>
 
       <div class="file-input-group">
-        <label for="pdf-upload" class="sr-only"
-          >Sélectionner un fichier PDF</label
-        >
+        <label for="pdf-upload" class="sr-only">Select a PDF File</label>
         <input
           id="pdf-upload"
           type="file"
@@ -26,28 +24,24 @@
           @click="doUpload"
           class="btn btn-primary"
         >
-          {{
-            loading.upload ? 'Extraction en cours…' : 'Extraire & Prévisualiser'
-          }}
+          {{ loading.upload ? 'Extracting…' : 'Extract & Preview' }}
         </button>
       </div>
       <p v-if="error.upload" class="error-message">{{ error.upload }}</p>
 
       <!-- Aperçu des données extraites -->
       <div v-if="extracted" class="data-preview">
-        <h3 class="preview-title">Données extraites</h3>
-        <p class="info-message">
-          Méthode d’extraction : {{ extracted.extractor }}
-        </p>
+        <h3 class="preview-title">Extracted Data</h3>
+        <p class="info-message">Extraction Method: {{ extracted.extractor }}</p>
         <ul>
           <!-- Référence -->
           <li class="detail-item">
-            <span class="label">Référence :</span>
+            <span class="label">Reference :</span>
             <input
               type="text"
               v-model="extracted.ref"
               class="value"
-              placeholder="Référence"
+              placeholder="Reference"
             />
           </li>
 
@@ -58,17 +52,15 @@
               type="text"
               v-model="extracted.date"
               class="value"
-              placeholder="JJ/MM/AAAA"
+              placeholder="DD/MM/YYYY"
             />
           </li>
 
           <!-- Immatriculation (select) -->
           <li class="detail-item">
-            <span class="label">Immatriculation :</span>
+            <span class="label">Registration:</span>
             <select v-model="extracted.immatriculation" class="value">
-              <option disabled value="">
-                -- Sélectionnez une immatriculation --
-              </option>
+              <option disabled value="">-- Select a registration --</option>
               <option
                 v-for="veh in vehicleOptions"
                 :key="veh.immatriculation"
@@ -81,11 +73,9 @@
 
           <!-- Véhicule (select) -->
           <li class="detail-item">
-            <span class="label">Véhicule :</span>
+            <span class="label">Vehicle :</span>
             <select v-model="extracted.type" class="value">
-              <option disabled value="">
-                -- Sélectionnez un type de véhicule --
-              </option>
+              <option disabled value="">-- Select a vehicle type --</option>
               <option
                 v-for="veh in vehicleOptions"
                 :key="veh.type + veh.immatriculation"
@@ -109,11 +99,11 @@
 
           <!-- Statut -->
           <li class="detail-item">
-            <span class="label">Statut :</span>
+            <span class="label">Status :</span>
             <select v-model="extracted.statut" class="value">
-              <option value="non payé">Non payé</option>
-              <option value="payé">Payé</option>
-              <option value="partiellement payé">Partiellement payé</option>
+              <option value="non payé">Unpaid</option>
+              <option value="payé">Paid</option>
+              <option value="partiellement payé">Partially Paid</option>
             </select>
           </li>
         </ul>
@@ -124,7 +114,7 @@
             @click="doRegister"
             class="btn btn-primary"
           >
-            {{ loading.register ? 'Enregistrement…' : 'Enregistrer en BDD' }}
+            {{ loading.register ? 'Saving…' : 'Save to DB' }}
           </button>
           <p v-if="error.register" class="error-message">
             {{ error.register }}
@@ -136,23 +126,23 @@
     <!-- 2) Liste des factures -->
     <section class="list-section">
       <div class="section-header">
-        <h2>Factures enregistrées</h2>
+        <h2>Registered Invoices</h2>
         <button @click="fetchInvoices" class="btn btn-secondary">
-          Rafraîchir la liste
+          Refresh List
         </button>
       </div>
 
-      <p v-if="loading.list" class="info-message">Chargement…</p>
+      <p v-if="loading.list" class="info-message">Loading…</p>
       <p v-if="error.list" class="error-message">{{ error.list }}</p>
 
       <table v-if="invoices.length" class="invoice-table">
         <thead>
           <tr class="table-head-row">
-            <th>Référence</th>
+            <th>Reference</th>
             <th>Date</th>
             <th>Type de véhicule</th>
-            <th>Immatriculation</th>
-            <th>Statut</th>
+            <th>Registration</th>
+            <th>Status</th>
             <th>Total TTC</th>
           </tr>
         </thead>
@@ -180,7 +170,7 @@
           @click="currentPage--"
           class="btn btn-secondary"
         >
-          « Précédent
+          « Previous
         </button>
         <span>Page {{ currentPage }} / {{ totalPages }}</span>
         <button
@@ -188,11 +178,11 @@
           @click="currentPage++"
           class="btn btn-secondary"
         >
-          Suivant »
+          Next »
         </button>
       </div>
 
-      <p v-else class="empty-message">Aucune facture enregistrée.</p>
+      <p v-else class="empty-message">No invoices registered.</p>
       <p v-if="errorPdf" class="error-message">{{ errorPdf }}</p>
     </section>
 
@@ -247,13 +237,22 @@ export default {
     }
   },
   methods: {
+    formatToDDMMYYYY(dateStr) {
+      const d = new Date(dateStr);
+      if (isNaN(d)) return '';
+      const dd = String(d.getDate()).padStart(2, '0');
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const yyyy = d.getFullYear();
+      return `${dd}/${mm}/${yyyy}`;
+    },
     displayField(value) {
       return value ?? 'N/A';
     },
+
     onFileChange(e) {
       const file = e.target.files[0];
       if (file && !file.type.includes('pdf')) {
-        this.error.upload = 'Le fichier doit être un PDF.';
+        this.error.upload = 'The file must be a PDF.';
         this.pdfFile = null;
         return;
       }
@@ -261,32 +260,50 @@ export default {
       this.extracted = null;
       this.error.upload = '';
     },
-
-    // 1) Upload & extraction avec remappage vers minuscules
+    // getField sert à standardiser la lecture des propriétés quel que soit le format de nommage que ton backend utilise, et à éviter les undefined
+    //pascal : PascalCase
+    // camel : camelCase
+    getField(d, pascal, camel) {
+      return d[pascal] ?? d[camel] ?? '';
+    },
+    // 1) Upload & extraction
     async doUpload() {
       if (!this.pdfFile) return;
       this.loading.upload = true;
       this.fallbackMode = false;
+
       try {
+        // Préparation du FormData pour l'API
+        // construire un ensemble de paires clé/valeur à envoyer en multipart/form-data
         const form = new FormData();
         form.append('pdf', this.pdfFile);
+
         const result = await apiServices.uploadVehicleInvoice(form);
         if (!result.success) throw new Error(result.message);
-        // 1️ on charge toujours la liste avant de mapper extracted
+
+        // On recharge toujours la liste des véhicules
         await this.fetchVehicleOptions();
         const d = result.data;
-
+        // On mappe proprement chaque champ
         this.extracted = {
-          ref: d.Ref ?? d.ref ?? '',
-          date: d.Date ?? d.date ?? '',
-          montant: d.total_ttc ?? d.Montant ?? d.montant ?? '',
-          // on ajoute d.vehicule au fallback de type, et d.Vehicule par sécurité
-          immatriculation: d.Immatriculation ?? d.immatriculation ?? '',
-          type: d.Type ?? d.type ?? d.Vehicule ?? d.vehicule ?? '',
-          statut: d.statut ?? 'non payé',
+          ref: this.getField(d, 'Ref', 'ref'),
+          date: this.formatToDDMMYYYY(this.getField(d, 'Date', 'date')),
+          montant:
+            this.getField(d, 'total_ttc', 'montant') ||
+            this.getField(d, 'Montant', 'montant'),
+          immatriculation: this.getField(
+            d,
+            'Immatriculation',
+            'immatriculation'
+          ),
+          type:
+            this.getField(d, 'Type', 'type') ||
+            this.getField(d, 'Vehicule', 'vehicule'),
+          statut: this.getField(d, 'statut', 'statut') || 'non payé',
           extractor: result.extractor ?? d.extractor ?? ''
         };
-        // 2️⃣ si la valeur extraite n'était pas déjà dans vehicleOptions, on l'y ajoute
+
+        // Si la plaque extraite n'est pas dans vehicleOptions, on l'ajoute
         if (
           this.extracted.immatriculation &&
           !this.vehicleOptions.find(
@@ -298,18 +315,20 @@ export default {
             type: this.extracted.type
           });
         }
+
+        // Si on n'a pas pu extraire immatriculation ou type, on passe en fallback
         if (!this.extracted.immatriculation || !this.extracted.type) {
           this.fallbackMode = true;
           await this.fetchVehicleOptions();
         }
       } catch (err) {
-        this.error.upload = err.message || 'Impossible d’extraire la facture.';
+        this.error.upload = err.message || 'Unable to extract the invoice.';
       } finally {
         this.loading.upload = false;
       }
     },
 
-    // 2) Récupération des options véhicules avec clés minuscules
+    //2) Récupération des options véhicules avec clés minuscules
     async fetchVehicleOptions() {
       try {
         const list = await apiServices.getVehicleList();
@@ -320,18 +339,19 @@ export default {
           allocation: v.allocation
         }));
       } catch (error) {
-        console.error('Erreur lors du chargement des véhicules :', error);
+        console.error('Error loading vehicles:', error);
       }
     },
 
     // 3) Enregistrement en BDD avec reconversion vers PascalCase
     async doRegister() {
       if (!this.extracted?.montant || !this.extracted?.ref) {
-        this.error.register = 'Certains champs sont manquants';
+        this.error.register = 'Some fields are missing.';
         return;
       }
       this.loading.register = true;
       try {
+        //objet de données(payload) qu'on envoie à l'API au moment de l'enregistrement
         const payload = {
           Ref: this.extracted.ref,
           Date: this.extracted.date,
@@ -348,21 +368,21 @@ export default {
       } catch (err) {
         this.error.register =
           err.response?.status === 409
-            ? 'Une facture avec cette référence existe déjà.'
-            : 'Échec de l’enregistrement en base.';
+            ? 'An invoice with this reference already exists.'
+            : 'Failed to save to database.';
       } finally {
         this.loading.register = false;
       }
     },
 
-    // 4) Liste des factures (inchangé)
+    // 4) Liste des factures
     async fetchInvoices() {
       this.loading.list = true;
       try {
         const list = await apiServices.getVehicleInvoices();
         this.invoices = Array.isArray(list) ? list : [];
       } catch {
-        this.error.list = 'Impossible de récupérer la liste.';
+        this.error.list = 'Unable to fetch the list.';
       } finally {
         this.loading.list = false;
       }
@@ -379,7 +399,7 @@ export default {
         this.currentPdfUrl = await apiServices.getVehicleInvoicePdfUrl(inv._id);
         this.showPdfModal = true;
       } catch {
-        this.errorPdf = 'Impossible de charger l’URL du PDF.';
+        this.errorPdf = 'Unable to load the PDF URL.';
       }
     },
 
@@ -388,7 +408,7 @@ export default {
       this.showPdfModal = false;
     }
   },
-
+  // moyen qui surveille une valeur réactive(data/ props)
   watch: {
     // 5) Watcher mis à jour pour clé minuscules
     async 'extracted.immatriculation'(newVal) {
@@ -398,7 +418,7 @@ export default {
           this.extracted.type = veh.Type || '';
           this.extracted.assignedTo = veh.assignedTo || '';
         } catch {
-          console.warn('Véhicule non trouvé pour immat', newVal);
+          console.warn('Vehicle not found for registration.', newVal);
           this.extracted.type = '';
           this.extracted.assignedTo = '';
         }
