@@ -49,7 +49,6 @@ export default {
       menuItems: [
         { name: 'Printer Parc', icon: 'fa-print', label: 'Printer Parc', path:'/printer-parc' },
         { name: 'Curative Maintenance', icon: 'fa-tools', label: 'Maintenance', path:'/cur_main' },
-        { name: 'History', icon: 'fa-history', label: 'History' }
       ]
     };
   }

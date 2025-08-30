@@ -7,8 +7,8 @@
           <img src="../assets/images/tav.png" alt="Logo" />
         </div>
         <div class="title-wrapper">
-          <h1>Gestion des véhicules</h1>
-          <p class="slogan">"Votre succès, notre passion!"</p>
+          <h1>Manage Vehicle</h1>
+          <p class="slogan">“Your success, our passion!”</p>
         </div>
       </div>
 
@@ -23,9 +23,7 @@
           title="Notifications"
         >
           <i class="fas fa-bell"></i>
-          <span v-if="notificationCount > 0" class="badge">
-            {{ notificationCount }}
-          </span>
+          
         </button>
 
         <button
@@ -41,9 +39,8 @@
     <!-- Menu navigation -->
     <ul class="navbar-menu">
       <li><router-link to="/dashboard/finance" exact>Dashboard</router-link></li>
-      <li><router-link to="/ManageVehicle">Gérer Véhicules</router-link></li>
-      <li><router-link to="/facturation">Facturation</router-link></li>
-      <li><router-link to="/historique">Historique</router-link></li>
+      <li><router-link to="/ManageVehicle">Manage Vehicle</router-link></li>
+      <li><router-link to="/facturation">Billing</router-link></li>
     </ul>
   </nav>
 </template>

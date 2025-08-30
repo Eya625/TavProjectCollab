@@ -128,11 +128,12 @@ const apiServices = {
       const response = await axios.get(`${API_BASE_URL}/consumption/invoices`);
       return response.data;
     } catch (error) {
-      console.error('Erreur lors de la récupération des consommations:', error);
+      console.error('Error fetching Invoices:', error);
       throw error;
     }
   },
   async addInvoice(invoice) {
+    // invoice : objet JavaScript contenant toutes les données de la facture à ajouter
     try {
       const response = await axios.post(
         `${API_BASE_URL}/consumption/invoices`,
@@ -140,7 +141,7 @@ const apiServices = {
       );
       return response.data;
     } catch (error) {
-      console.error("Erreur lors de l'ajout d'une facture :", error);
+      console.error('Error Adding invoices:', error);
       throw error;
     }
   },
@@ -152,10 +153,7 @@ const apiServices = {
       );
       return response.data;
     } catch (error) {
-      console.error(
-        'Erreur lors de la mise à jour de la facture :',
-        error.response?.data || error
-      );
+      console.error('Error Updating Invoice', error.response?.data || error);
       throw error;
     }
   },
@@ -166,7 +164,7 @@ const apiServices = {
       );
       return response.data;
     } catch (error) {
-      console.error('Erreur lors de la suppression de la facture :', error);
+      console.error('Error while deleting invoice :', error);
       throw error;
     }
   },
@@ -178,7 +176,7 @@ const apiServices = {
       );
       return response.data;
     } catch (error) {
-      console.error('Erreur lors de la récupération des cartes APS :', error);
+      console.error('Error while fetching OLA Cards :', error);
       throw error;
     }
   },
@@ -192,7 +190,7 @@ const apiServices = {
       );
       return response.data;
     } catch (error) {
-      console.error("Erreur lors de l'ajout de la carte OLA :", error);
+      console.error('Error while Adding OLA Card:', error);
       throw error;
     }
   },
@@ -205,10 +203,7 @@ const apiServices = {
       );
       return response.data;
     } catch (error) {
-      console.error(
-        'Erreur lors de la récupération des détails de la carte OLA :',
-        error
-      );
+      console.error('Error fetching ola card details :', error);
       throw error;
     }
   },
@@ -225,7 +220,7 @@ const apiServices = {
       // Retourner la réponse après la mise à jour
       return response.data;
     } catch (error) {
-      console.error('Erreur lors de la mise à jour de la carte OLA :', error);
+      console.error('Error updating ola card:', error);
       throw error;
     }
   },
@@ -238,7 +233,7 @@ const apiServices = {
       );
       return response.data;
     } catch (error) {
-      console.error('Erreur lors de la suppression de la carte OLA :', error);
+      console.error('Error deleting ola card', error);
       throw error;
     }
   },
@@ -254,7 +249,7 @@ const apiServices = {
       const response = await axios.put(url);
       return response.data;
     } catch (error) {
-      console.error('Erreur lors de la suppression du détail :', error);
+      console.error('Error deleting detail', error);
       throw error;
     }
   },
@@ -265,7 +260,7 @@ const apiServices = {
       const response = await axios.get(`${API_BASE_URL}/invoicespdf`);
       return response.data;
     } catch (error) {
-      console.error('Erreur lors de la récupération des factures PDF :', error);
+      console.error('Error fetching PDF invoices :', error);
       throw error;
     }
   },
@@ -278,7 +273,7 @@ const apiServices = {
       );
       return response.data;
     } catch (error) {
-      console.error("Erreur lors de l'upload de la facture PDF :", error);
+      console.error('Error uploading PDF invoices:', error);
       throw error;
     }
   },
@@ -288,7 +283,7 @@ const apiServices = {
       // l’API renvoie { url: "http://…/uploads/…" }
       return response.data.url;
     } catch (error) {
-      console.error('Erreur lors de la récupération de l’URL PDF :', error);
+      console.error('Error fetching URL PDF:', error);
       throw error;
     }
   },
@@ -311,13 +306,13 @@ const apiServices = {
   },
   /* __________________ Partie Gestion des Véhicules __________________ */
 
-  // Récupérer la liste de tous les véhicules dans l'interface de gestion des véhicules 
- async getAllVehicles() {
+  // Récupérer la liste de tous les véhicules dans l'interface de gestion des véhicules
+  async getAllVehicles() {
     try {
       const response = await axios.get(`${API_BASE_URL}/vehicles`);
       return response.data;
     } catch (error) {
-      console.error('Erreur lors de la récupération des véhicules :', error);
+      console.error('Error fetching vehicles:', error);
       throw error;
     }
   },
@@ -328,7 +323,7 @@ const apiServices = {
       const response = await axios.get(`${API_BASE_URL}/vehicles/${id}`);
       return response.data;
     } catch (error) {
-      console.error('Erreur lors de la récupération du véhicule :', error);
+      console.error('Error fetching vehicle By ID :', error);
       throw error;
     }
   },
@@ -342,7 +337,7 @@ const apiServices = {
       );
       return response.data;
     } catch (error) {
-      console.error("Erreur lors de l'ajout du véhicule :", error);
+      console.error('Error adding vehicle:', error);
       throw error;
     }
   },
@@ -356,7 +351,7 @@ const apiServices = {
       );
       return response.data;
     } catch (error) {
-      console.error('Erreur lors de la mise à jour du véhicule :', error);
+      console.error('Error updating vehicle data:', error);
       throw error;
     }
   },
@@ -367,13 +362,13 @@ const apiServices = {
       console.log('Véhicule supprimé du backend');
       return response.data;
     } catch (error) {
-      console.error('Erreur lors de la suppression du véhicule :', error);
+      console.error('Error deleting vehicle:', error);
       throw error;
     }
   },
   /*__________Partie facturation des véhicules (bassma) _________*/
   // Déclaration comme méthode async dans un objet
-async getVehicleList() {
+  async getVehicleList() {
     const resp = await axios.get(`${API_BASE_URL}/vehicles/select`);
     return resp.data;
   },
@@ -397,20 +392,15 @@ async getVehicleList() {
     const resp = await axios.get(`${API_BASE_URL}/billing/${id}/pdf`);
     return resp.data.pdf; // ← récupère bien le champ “pdf”
   },
-async uploadVehicleInvoice(formData) {
-  const resp = await axios.post(
-    `${API_BASE_URL}/billing/upload`,
-    formData,
-    { headers: { 'Content-Type': 'multipart/form-data' } }
-  );
-  return resp.data;  // ← ici on renvoie { success, data, filename }
-},
+  async uploadVehicleInvoice(formData) {
+    const resp = await axios.post(`${API_BASE_URL}/billing/upload`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return resp.data; // ← ici on renvoie { success, data, filename }
+  },
 
-    async registerVehicleInvoice(data) {
-    return axios.post(
-      `${API_BASE_URL}/billing`,
-      data
-    );
+  async registerVehicleInvoice(data) {
+    return axios.post(`${API_BASE_URL}/billing`, data);
   },
 
   async getInvoicesByImmat(immat) {
@@ -449,18 +439,7 @@ async uploadVehicleInvoice(formData) {
       const response = await axios.get(`${API_BASE_URL}/printers`);
       return response.data;
     } catch (error) {
-      console.error('Erreur lors de la récupération des imprimantes :', error);
-      throw error;
-    }
-  },
-
-  // Récupérer tous les printers
-  async getPrinters() {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/printers`);
-      return response.data;
-    } catch (error) {
-      console.error('Erreur lors de la récupération des imprimantes :', error);
+      console.error('Error fetching printers :', error);
       throw error;
     }
   },
@@ -471,7 +450,7 @@ async uploadVehicleInvoice(formData) {
       const response = await axios.get(`${API_BASE_URL}/printers/${id}`);
       return response.data;
     } catch (error) {
-      console.error("Erreur lors de la récupération de l'imprimante :", error);
+      console.error('Error fetching printer by ID :', error);
       throw error;
     }
   },
@@ -485,7 +464,7 @@ async uploadVehicleInvoice(formData) {
       );
       return response.data;
     } catch (error) {
-      console.error("Erreur lors de l'ajout de l'imprimante :", error);
+      console.error('Error Adding Printer:', error);
       throw error;
     }
   },
@@ -499,7 +478,7 @@ async uploadVehicleInvoice(formData) {
       );
       return response.data;
     } catch (error) {
-      console.error("Erreur lors de la mise à jour de l'imprimante :", error);
+      console.error('Error updating printer :', error);
       throw error;
     }
   },
@@ -508,22 +487,24 @@ async uploadVehicleInvoice(formData) {
   async deletePrinter(id) {
     try {
       const response = await axios.delete(`${API_BASE_URL}/printers/${id}`);
-      console.log('Imprimante supprimée du backend');
+      console.log('Printer deleted from backend');
       return response.data;
     } catch (error) {
-      console.error("Erreur lors de la suppression de l'imprimante :", error);
+      console.error('Error deleting Printer :', error);
       throw error;
     }
   },
 
   /* _____________ Dasboarding _________________ */
+  // Récupère la consommation par lieu pour une année et options de filtre
+
   async getByLocation(year, employee = '', locations = []) {
     const { data } = await dashboardApi.get('/by-location', {
       params: { year, employee, locations }
-    });
-    return data;
+    });   
+    return data; // on retourne directement le payload JSON
   },
-
+  // Récupère la consommation mensuelle pour une année et filtres
   async getByMonth(year, employee = '', locations = []) {
     const { data } = await dashboardApi.get('/by-month', {
       params: { year, employee, locations }
@@ -567,123 +548,55 @@ async uploadVehicleInvoice(formData) {
     return data;
   },
   async getYearlyConsumption(filters) {
-    const { data } = await dashboardApi.get(
-      '/consumption/yearly',
-      { params: filters }
-    );
+    const { data } = await dashboardApi.get('/consumption/yearly', {
+      params: filters
+    });
     return data;
   },
 
+  /*______ Partie Analyse Finance _______   */
 
-                     /*______ Partie Analyse Finance _______   */
-                     
-  getFinanceVehicles()    { return dashboardFinanceApi.get('/vehicles').then(r => r.data) },
-  getTotalVehicles(v='')  { return dashboardFinanceApi.get('/totalVehicles',{ params:{ veh:v||undefined } }).then(r => r.data.count) },
-  getAllocation(v='')     { return dashboardFinanceApi.get('/allocation',{ params:{ veh:v||undefined } }).then(r => r.data) },
-  getTotalBilled(v='')    { return dashboardFinanceApi.get('/totalBilled',{ params:{ veh:v||undefined } }).then(r => r.data) },
-  getAvgInvoice(v='')     { return dashboardFinanceApi.get('/avgInvoice',{ params:{ veh:v||undefined } }).then(r => r.data) },
-  getTop5Vehicles(v='')   { return dashboardFinanceApi.get('/top5',{ params:{ veh:v||undefined } }).then(r => r.data) },
-  getCostByBranch(v='')   { return dashboardFinanceApi.get('/byBranch',{ params:{ veh:v||undefined } }).then(r => r.data) },
-  getInvoicesByMonth(v=''){ return dashboardFinanceApi.get('/invoicesByMonth',{ params:{ veh:v||undefined } }).then(r => r.data) },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  getFinanceVehicles() {
+    // r est un objet complet : { data: ..., status: ..., headers: ..., config: ... }
+    return dashboardFinanceApi.get('/vehicles').then((r) => r.data);
+  },
+  getTotalVehicles(v = '') {
+    return dashboardFinanceApi
+      .get('/totalVehicles', { params: { veh: v || undefined } })
+      .then((r) => r.data.count);
+  },
+  getAllocation(v = '') {
+    return dashboardFinanceApi
+      .get('/allocation', { params: { veh: v || undefined } })
+      .then((r) => r.data);
+  },
+  getTotalBilled(v = '') {
+    return dashboardFinanceApi
+      .get('/totalBilled', { params: { veh: v || undefined } })
+      .then((r) => r.data);
+  },
+  getAvgInvoice(v = '') {
+    return dashboardFinanceApi
+      .get('/avgInvoice', { params: { veh: v || undefined } })
+      .then((r) => r.data);
+  },
+  getTop5Vehicles(v = '') {
+    return dashboardFinanceApi
+      .get('/top5', { params: { veh: v || undefined } })
+      .then((r) => r.data);
+  },
+  getCostByBranch(v = '') {
+    return dashboardFinanceApi
+      .get('/byBranch', { params: { veh: v || undefined } })
+      .then((r) => r.data);
+  },
+  getInvoicesByMonth(v = '') {
+    return dashboardFinanceApi
+      .get('/invoicesByMonth', { params: { veh: v || undefined } })
+      .then((r) => r.data);
+  }
 };
 export default apiServices;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // Récupérer l'historique des actions
 export const getActionHistory = () => {

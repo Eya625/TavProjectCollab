@@ -19,7 +19,7 @@
         <!-- Liste des liens de navigation -->
         <ul v-if="!isCollapsed">
           <li>
-            <router-link to="/OLADashboard" class="nav-item">
+            <router-link to="/dashchart" class="nav-item">
               <i class="fas fa-home"></i> <span>Dashboard</span>
             </router-link>
           </li>
@@ -36,9 +36,9 @@
                 </router-link>
               </li>
               <li>
-                <router-link to="/aps" class="nav-item sub-item">
+                <!--<router-link to="/aps" class="nav-item sub-item">
                   <i class="fas fa-gas-pump"></i> <span>APS</span>
-                </router-link>
+                </router-link>-->
               </li>
             </ul>
           </li>

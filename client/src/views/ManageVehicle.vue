@@ -1,12 +1,9 @@
 <template>
   <div>
-    <!-- Navbar FIXE en dehors du conteneur de contenu -->
-    <VehicleNavbar :notification-count="3" @show-notification="handleNotification" />
+    <VehicleNavbar />
 
-    <!-- Contenu décalé sous la navbar -->
     <div class="manage-container">
-      <button class="add-btn" @click="openAddForm">+ Ajouter un véhicule</button>
-
+      <button class="add-btn" @click="openAddForm">+ Add Vehicle</button>
       <transition name="fade-slide">
         <VehicleForm
           v-if="showForm"
@@ -25,7 +22,7 @@
 
       <ConfirmModal
         v-if="showDeleteModal"
-        :message="`Voulez-vous vraiment supprimer le véhicule N° ${vehicleToDelete?.N} ?`"
+        :message="`Do you really want to delete vehicle No.  ${vehicleToDelete?.N} ?`"
         @confirm="confirmDeletion"
         @cancel="cancelDeletion"
       />
@@ -97,10 +94,7 @@ export default {
       this.closeForm();
       await this.fetchVehicles();
     },
-    handleNotification() {
-      // Remplacez par votre système de notifications
-      alert("Opération réussie !");
-    }
+    
   }
 };
 </script>

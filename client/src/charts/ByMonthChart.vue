@@ -1,6 +1,6 @@
 <template>
   <div class="chart-card">
-    <h3>Consommation par mois ({{ year }})</h3>
+    <h3>Monthly Consumption ({{ year }})</h3>
     <canvas ref="ctx"></canvas>
   </div>
 </template>
@@ -86,7 +86,7 @@ export default {
         data: {
           labels: months,
           datasets: [{
-            label: 'Consommation',
+            label: 'Consumption',
             data: values,
             borderColor: color,         // couleur de la ligne
             backgroundColor: 'transparent', // plus d’aire colorée

@@ -9,13 +9,13 @@
       {{ notificationMessage }}
     </div>
 
-    <h2 class="title">Liste des Véhicules</h2>
+    <h2 class="title">Vehicle List</h2>
 
     <div class="header-bar">
       <input
         type="text"
         v-model="search"
-        placeholder="Recherche..."
+        placeholder="Search..."
         class="search-input"
       />
     </div>
@@ -24,13 +24,13 @@
       <thead>
         <tr>
           <th>N°</th>
-          <th>Affecté à</th>
-          <th>Branche</th>
-          <th>Modèle</th>
-          <th>Année</th>
+          <th>Assigned To</th>
+          <th>Branch</th>
+          <th>Model</th>
+          <th>Year</th>
           <th>Date 1re Immat.</th>
-          <th>Immatriculation</th>
-          <th>Affectation</th>
+          <th>Registration</th>
+          <th>Assignment</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -46,7 +46,7 @@
           <td>{{ vehicle.allocation }}</td>
           <td>
             <button class="btn-invoice" @click="showInvoices(vehicle)">
-              <i class="fas fa-file-invoice-dollar"></i> Voir Factures
+              <i class="fas fa-file-invoice-dollar"></i> View Invoices
             </button>
             <button class="btn-delete" @click="$emit('deleteVehicle', vehicle._id)">
               <i class="fas fa-trash-alt"></i>
@@ -61,7 +61,7 @@
         <div class="drawer-header">
           <h3>
             <i class="fas fa-receipt"></i>
-            Factures de {{ selectedVehicle.model }}
+            Invoice For {{ selectedVehicle.model }}
             ({{ normalizeImmat(selectedVehicle.registrationNumber) }})
             <span v-if="invoiceSaved" class="green-dot"></span>
           </h3>
@@ -73,7 +73,7 @@
         <div class="upload-section">
           <label class="upload-btn" for="fileInput">
             <i class="fas fa-upload"></i>
-            <span>Téléverser une facture</span>
+            <span>Upload an Invoice</span>
           </label>
           <input
             id="fileInput"
@@ -84,7 +84,7 @@
             style="display: none"
           />
           <transition name="bounce">
-            <div v-if="uploading" class="uploading-indicator">Chargement...</div>
+            <div v-if="uploading" class="uploading-indicator">Loading…</div>
           </transition>
         </div>
 
@@ -101,26 +101,26 @@
               </div>
               <div class="card-body">
                 <div class="card-field"><strong><i class="fas fa-car-side"></i> Type:</strong> {{ invoice.Type }}</div>
-                <div class="card-field"><strong><i class="fas fa-coins"></i> Montant:</strong> {{ invoice.Montant }} TND</div>
+                <div class="card-field"><strong><i class="fas fa-coins"></i>Amount:</strong> {{ invoice.Montant }} TND</div>
               </div>
               <div class="card-footer">
                 <a v-if="invoice.pdfUrl" :href="invoice.pdfUrl" target="_blank" class="btn btn-view">
-                  <i class="fas fa-file-pdf"></i> Ouvrir PDF
+                  <i class="fas fa-file-pdf"></i> Open PDF
                 </a>
                 <button v-else @click="previewInvoice(invoice)" class="btn btn-preview">
-                  <i class="fas fa-eye"></i> Prévisualiser
+                  <i class="fas fa-eye"></i> Preview
                 </button>
               </div>
             </div>
           </div>
           <div v-else class="no-invoices">
-            <p><i class="fas fa-exclamation-circle"></i> Aucune facture disponible pour ce véhicule.</p>
+            <p><i class="fas fa-exclamation-circle"></i>No invoice available for this vehicle.</p>
           </div>
         </div>
 
         <div v-if="selectedInvoice" class="pdf-preview">
           <button class="close-preview" @click="closePreview">
-            <i class="fas fa-arrow-left"></i> Fermer aperçu
+            <i class="fas fa-arrow-left"></i> Close preview
           </button>
           <embed :src="selectedInvoice.pdfUrl" type="application/pdf" width="100%" height="400px" />
         </div>
@@ -158,7 +158,7 @@ export default {
 
       showSuccessNotification: false,
       notificationMessage: '',
-      notificationType: ''    // 'success' ou 'error'
+      notificationType: ''   
     };
   },
   computed: {
@@ -224,7 +224,7 @@ export default {
       } catch (err) {
         console.error(err);
         this.selectedVehicle = { ...vehicle, invoices: [] };
-        this.showNotification('Erreur lors du chargement des factures.', 'error');
+        this.showNotification('Error loading invoices.', 'error');
       }
       this.selectedInvoice = null;
       this.invoiceSaved = false;
@@ -258,7 +258,7 @@ export default {
 
         const uploadRes = await apiServices.uploadVehicleInvoice(formData);
         if (!uploadRes.success) {
-          this.showNotification('Échec du téléversement de la facture', 'error');
+          this.showNotification('Error Uploading invoice', 'error');
           return;
         }
 
@@ -266,7 +266,7 @@ export default {
         const extractedImmat = normalizeImmat(extracted.Immatriculation || '');
         if (extractedImmat !== expectedImmat) {
           this.showNotification(
-            `Immatriculation extraite (${extractedImmat}) ne correspond pas à ${expectedImmat}.`,
+            `Extracted registration (${extractedImmat}) does not match ${expectedImmat}`,
             'error'
           );
           return;
@@ -274,7 +274,7 @@ export default {
 
         const newRef = extracted.Ref;
         if (this.selectedVehicle.invoices.some(inv => inv.Ref === newRef)) {
-          this.showNotification(`La référence ${newRef} existe déjà.`, 'error');
+          this.showNotification(`Reference ${newRef} already exists.`, 'error');
           return;
         }
 
@@ -287,16 +287,16 @@ export default {
         };
         const registerRes = await apiServices.registerVehicleInvoice(invoiceData);
         if (!registerRes.invoice) {
-          this.showNotification('Échec de l’enregistrement de la facture', 'error');
+          this.showNotification('Failed to save the invoice.', 'error');
           return;
         }
 
         await this.showInvoices(this.selectedVehicle);
         this.invoiceSaved = true;
-        this.showNotification('Facture enregistrée avec succès', 'success');
+        this.showNotification('Invoice saved successfully.', 'success');
       } catch (err) {
         console.error(err);
-        this.showNotification('Une erreur est survenue lors de l’enregistrement.', 'error');
+        this.showNotification('An error occurred while saving.', 'error');
       } finally {
         this.uploading = false;
       }

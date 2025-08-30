@@ -20,6 +20,7 @@ const printerRoutes = require('./routes/printerRoutes');
 const detailsRelevesRoutes =require('./routes/detailsRelevesRoutes');
 const invoicePDFRoutes = require('./routes/invoicePDFRoutes');
 const dashboardFinRoutes = require('./routes/dashboardFinanceRoutes');
+const dashboardRouter = require('./routes/dashboard'); 
 
 // --- App & Server Initialization ---
 const app = express();
@@ -85,6 +86,7 @@ app.use('/api/printers',printerRoutes);
 app.use('/api/billing/releves', detailsRelevesRoutes);
 app.use('/api/invoicespdf', invoicePDFRoutes);
 app.use('/api/dashboard/finance/kpis',dashboardFinRoutes);
+app.use('/api/invoices', require('./routes/billingRoutes'));
 
 // --- Socket.io Events ---
 io.on('connection', socket => {
@@ -94,9 +96,8 @@ io.on('connection', socket => {
   });
 });
 
-// après tous tes app.use('/api/…')
-const dashboardRouter = require('./routes/dashboard');  // <-- assure-toi du bon nom de fichier
 app.use('/api/dashboard', dashboardRouter);
+
 // --- Start Server ---
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {

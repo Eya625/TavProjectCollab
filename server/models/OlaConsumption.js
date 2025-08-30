@@ -29,7 +29,7 @@ const OlaConsumptionDetailSchema = new mongoose.Schema({
   }
 }, { _id: false });
 
-// Schéma principal de la carte APS
+// Schéma principal de la carte OLA
 const OlaConsumptionSchema = new mongoose.Schema({
   year: { type: Number, required: true, index: true },
   totalConsumption: { type: Number, default: 0 },

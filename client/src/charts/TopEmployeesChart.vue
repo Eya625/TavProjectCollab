@@ -1,6 +1,6 @@
 <template>
   <div class="chart-card">
-    <h3>Top 10 employés ({{ year }})</h3>
+    <h3>Top 10 employees({{ year }})</h3>
     <canvas ref="ctx"></canvas>
   </div>
 </template>

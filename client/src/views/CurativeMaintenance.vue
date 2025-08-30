@@ -10,7 +10,6 @@
       <header class="header">
         <h1>Printer Maintenance Management</h1>
         <div class="header-icons">
-          <font-awesome-icon icon="fa-user-circle" class="profile-icon" />
           <div class="notification-icon">
             <font-awesome-icon icon="fa-bell" />
           </div>
@@ -67,6 +66,19 @@
           </div>
           <div class="card-content">
             <h2>Total Cost This Month</h2>
+            <p>{{ totalCostThisMonth }} DT</p>
+            <small
+              >Somme des coûts du Mois
+              {{ new Date().toLocaleString('fr', { month: 'long' }) }}</small
+            >
+          </div>
+        </div>
+         <div class="card">
+          <div class="card-icon">
+            <font-awesome-icon icon="fa-coins" />
+          </div>
+          <div class="card-content">
+            <h2>printer with most interventions</h2>
             <p>{{ totalCostThisMonth }} DT</p>
             <small
               >Somme des coûts du Mois

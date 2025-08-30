@@ -28,5 +28,8 @@ const invoiceSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },      // Date de mise à jour
 });
 
+// créer || récupère un Model à partir d'un schéma
+// Invoice est le nom model 
+// invoiceschema est la structure des documents
 const Invoice = mongoose.model("Invoice", invoiceSchema);
 module.exports = Invoice;

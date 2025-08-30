@@ -1,13 +1,13 @@
 <template>
   <div class="chart-card">
-    <h3>Évolution YoY ({{ selectedYear }})</h3>
+    <h3>YoY Evolution({{ selectedYear }})</h3>
     <table class="yoy-table">
       <thead>
         <tr>
-          <th>Mois</th>
+          <th>Month</th>
           <th>{{ selectedYear - 1 }}</th>
           <th>{{ selectedYear }}</th>
-          <th>Variation %</th>
+          <th>Evolution %</th>
         </tr>
       </thead>
       <tbody>

@@ -1,86 +1,93 @@
 <template>
-  <div class="dashboard">
-    <header class="dashboard-header">
-  <div class="logo left">
-    <img src="../assets/images/tav2.png" alt="TAV Tunisie" class="logo-tav animate-slide-left" />
-  </div>
+  <div class="layout">
+    <!-- Navbar à gauche -->
+    <NavBar :showGreenDot="false" />
 
-  <div class="header-center">
-    <h2 class="animate-fade-in">Administrative Fuel Control – TAV</h2>
-    <p class="slogan animate-slide-up">« Reliable Insights. Responsible Management.»</p>
-  </div>
+    <!-- Contenu principal -->
+    <div class="dashboard">
+      <header class="dashboard-header">
+        <div class="logo left">
+          <img src="../assets/images/tav2.png" alt="TAV Tunisie" class="logo-tav animate-slide-left" />
+        </div>
 
-  <div class="logo right">
-    <img src="../assets/images/olaenerg.png" alt="OLA Energy" class="logo-ola animate-slide-right" />
-  </div>
-</header>
+        <div class="header-center">
+          <h2 class="animate-fade-in">Administrative Fuel Control – TAV</h2>
+          <p class="slogan animate-slide-up">« Reliable Insights. Responsible Management.»</p>
+        </div>
 
-    <div class="dashboard-body">
-      <div class="dashboard-content">
-        <!-- Carte Totale en full-width -->
-        <TotalConsumptionCard
-          class="card-wide"
-          :year="year"
-          :selected-months="selectedMonths"
-          :selected-employee="selectedEmployee"
-          :selected-locations="selectedLocations"
-        />
+        <div class="logo right">
+          <img src="../assets/images/olaenerg.png" alt="OLA Energy" class="logo-ola animate-slide-right" />
+        </div>
+      </header>
 
-        <!-- Par location (pie) -->
-        <ByLocationChart
-          class="chart-pie"
-          :year="year"
-          :selected-employee="selectedEmployee"
-          :selected-locations="selectedLocations"
-          :colors="locationColors"
-        />
+      <div class="dashboard-body">
+        <div class="dashboard-content">
+          <!-- Carte Totale en full-width -->
+          <TotalConsumptionCard
+            class="card-wide"
+            :year="year"
+            :selected-months="selectedMonths"
+            :selected-employee="selectedEmployee"
+            :selected-locations="selectedLocations"
+          />
 
-        <!-- Par mois (line) -->
-        <ByMonthChart
-          class="chart-grid"
-          :year="year"
-          :selected-employee="selectedEmployee"
-          :selected-locations="selectedLocations"
-          :selected-months="selectedMonths"
-          :colors="monthColors"
-        />
+          <!-- Par location (pie) -->
+          <ByLocationChart
+            class="chart-pie"
+            :year="year"
+            :selected-employee="selectedEmployee"
+            :selected-locations="selectedLocations"
+            :colors="locationColors"
+          />
 
-        <!-- Top employés (bar) -->
-        <TopEmployeesChart
-          class="chart-grid"
-          :year="year"
-          :selected-employee="selectedEmployee"
-          :selected-locations="selectedLocations"
-          :colors="topEmpColors"
-        />
+          <!-- Par mois (line) -->
+          <ByMonthChart
+            class="chart-grid"
+            :year="year"
+            :selected-employee="selectedEmployee"
+            :selected-locations="selectedLocations"
+            :selected-months="selectedMonths"
+            :colors="monthColors"
+          />
 
-        <!-- YoY (table) -->
-        <YoYTable
-          class="chart-grid"
-          :selected-year="year"
-          :selected-employee="selectedEmployee"
-          :selected-locations="selectedLocations"
+          <!-- Top 10 employés (bar) -->
+          <TopEmployeesChart
+            class="chart-grid"
+            :year="year"
+            :selected-employee="selectedEmployee"
+            :selected-locations="selectedLocations"
+            :colors="topEmpColors"
+          />
+
+          <!-- YoY (table) -->
+          <YoYTable
+            class="chart-grid"
+            :selected-year="year"
+            :selected-employee="selectedEmployee"
+            :selected-locations="selectedLocations"
+          />
+        </div>
+
+        <!-- Panneau de filtres -->
+        <FilterPanels
+          class="filter-sticky"
+          :years="years"
+          :employees="employeeList"
+          :locations="locationList"
+          :months="monthList"
+          v-model:modelValue="year"
+          v-model:selected-employee="selectedEmployee"
+          v-model:selected-locations="selectedLocations"
+          v-model:selected-months="selectedMonths"
         />
       </div>
-
-      <!-- Panneau de filtres sticky -->
-      <FilterPanels
-        class="filter-sticky"
-        :years="years"
-        :employees="employeeList"
-        :locations="locationList"
-        :months="monthList"
-        v-model:modelValue="year"
-        v-model:selected-employee="selectedEmployee"
-        v-model:selected-locations="selectedLocations"
-        v-model:selected-months="selectedMonths"
-      />
     </div>
   </div>
 </template>
 
 <script>
 import { ref, onMounted } from 'vue';
+import NavBar from '../components/NavBar.vue';
 import api from '../services/apiServices';
 import FilterPanels from '../charts/FilterPanels.vue';
 import ByLocationChart from '../charts/ByLocationChart.vue';
@@ -90,8 +97,9 @@ import YoYTable from '../charts/YoYTable.vue';
 import TotalConsumptionCard from '../charts/TotalConsumptionCard.vue';
 
 export default {
-  name: 'Dashboard',
+  name: 'DashChart',
   components: {
+    NavBar,
     FilterPanels,
     ByLocationChart,
     ByMonthChart,
@@ -100,6 +108,7 @@ export default {
     TotalConsumptionCard
   },
   setup() {
+    // Listes de filtrage
     const years            = ref([]);
     const employeeList     = ref([]);
     const locationList     = ref([]);
@@ -108,19 +117,28 @@ export default {
       'July','August','September','October','November','December'
     ]);
 
+
+    // crée pour la selection de user
+    // ref -> assure la réactivité en vue 3
     const year              = ref(new Date().getFullYear());
     const selectedEmployee  = ref('');
     const selectedLocations = ref([]);
     const selectedMonths    = ref([]);
-
+ 
     const locationColors = ['rgba(255,140,0,0.8)','rgba(65,105,225,0.8)','rgba(0,191,255,0.8)'];
     const monthColors    = ['rgba(27,38,59,0.8)'];
     const topEmpColors   = ['rgba(255,140,0,0.8)','rgba(65,105,225,0.8)','rgba(0,191,255,0.8)'];
 
     onMounted(async () => {
+  // 1) Au moment où le composant est monté, on charge depuis l’API :
+  //    - toutes les années disponibles (years.value)
+  //    - la liste des employés (employeeList.value)
+  //    - la liste des locations (locationList.value)
       years.value        = await api.getAllYears();
       employeeList.value = await api.getAllEmployees();
       locationList.value = await api.getAllLocations();
+   // 2) On vérifie que l’année par défaut (cette année) figure bien dans la liste renvoyée.
+   // Si ce n’est pas le cas, on prend la dernière année disponible.     
       if (!years.value.includes(year.value)) {
         year.value = years.value.at(-1) || year.value;
       }
@@ -143,8 +161,13 @@ export default {
 };
 </script>
 <style scoped>
+.layout {
+  display: flex;
+}
+
 .dashboard {
   min-height: 100vh;
+  flex: 1;
   display: flex;
   flex-direction: column;
   background: url('../assets/images/arriplan.jpeg') center/cover no-repeat;
@@ -152,6 +175,8 @@ export default {
   padding: 1rem;
   box-sizing: border-box;
 }
+
+
 
 /* En-tête */
 .dashboard-header {

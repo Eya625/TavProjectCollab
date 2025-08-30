@@ -3,14 +3,15 @@
     <div class="profile-card">
       <img
         class="logo"
-        src="https://th.bing.com/th/id/R.ff64d6aeb1e605f92db2085431d6dcf2?rik=WkM7xHW3ugbl5g&pid=ImgRaw&r=0"
+        src="../assets/images/tav2.png"
         alt=""
       />
 
       <div class="profile-picture">
-        <button class="exit-btn">
-          <i class="fas fa-sign-out-alt"></i>
-        </button>
+        <router-link to="/" class="exit-btn">
+  <i class="fas fa-sign-out-alt"></i>
+</router-link>
+
         <img :src="profile.profileImage" alt="Profile Image" />
         <!-- Icône de caméra pour déclencher l'upload -->
         <label for="fileInput" class="edit-icon">
@@ -193,7 +194,7 @@ export default {
   display: flex;
   opacity: 1;
   width: 10;
-  height: 40px;
+  height: 80px;
 }
 
 .profile-card {
